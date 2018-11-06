@@ -1,6 +1,7 @@
 package com.xinchen.java.tools;
 
 /**
+ *
  * Hello world!
  *
  */
