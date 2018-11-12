@@ -14,13 +14,41 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <fastjson.version>1.2.47</fastjson.version>
+    <junit.version>4.11</junit.version>
   </properties>
 
   <dependencies>
+
+    <!-- 工具类 -->
+    <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>26.0-jre</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.2</version>
+      <scope>provided</scope>
+    </dependency>
+
+
+    <!-- json工具类相关 -->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>${fastjson.version}</version>
+    </dependency>
+
+
+    <!-- 单元测试相关 -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
