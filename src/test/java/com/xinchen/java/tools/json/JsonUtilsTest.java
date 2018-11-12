@@ -1,5 +1,7 @@
 package com.xinchen.java.tools.json;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +19,8 @@ public class JsonUtilsTest {
     private TempObject tempObject;
 
     private List<Object> list;
+
+    private String jsonList = "[{\"Id\":1,\"Age\":24,\"Price\":23.0,\"Ok\":true,\"Date\":\"2018-11-12 23:59:59\"},{\"Id\":1,\"Age\":24,\"Price\":23.0,\"Ok\":true,\"Date\":\"2018-11-12 23:59:59\"},{\"Id\":1,\"Age\":24,\"Price\":23.0,\"Ok\":true,\"Date\":\"2018-11-12 23:59:59\"},{\"Id\":1,\"Age\":24,\"Price\":23.0,\"Ok\":true,\"Date\":\"2018-11-12 23:59:59\"},{\"Id\":1,\"Age\":24,\"Price\":23.0,\"Ok\":true,\"Date\":\"2018-11-12 23:59:59\"},{\"Id\":1,\"Age\":24,\"Price\":23.0,\"Ok\":true,\"Date\":\"2018-11-12 23:59:59\"},{\"Id\":1,\"Age\":24,\"Price\":23.0,\"Ok\":true,\"Date\":\"2018-11-12 23:59:59\"},{\"Id\":1,\"Age\":24,\"Price\":23.0,\"Ok\":true,\"Date\":\"2018-11-12 23:59:59\"},{\"Id\":1,\"Age\":24,\"Price\":23.0,\"Ok\":true,\"Date\":\"2018-11-12 23:59:59\"},{\"Id\":1,\"Age\":24,\"Price\":23.0,\"Ok\":true,\"Date\":\"2018-11-12 23:59:59\"}]";
 
     @Before
     public void init() throws CloneNotSupportedException {
@@ -37,16 +41,39 @@ public class JsonUtilsTest {
 
     @Test
     public void object2JsonString() {
-        System.out.println(JsonUtils.object2JsonString(tempObject));
+        System.out.println(JsonUtils.object2Json(tempObject));
 
-        System.out.println(JsonUtils.object2JsonString(list));
+        System.out.println(JsonUtils.object2Json(list));
     }
 
     @Test
     public void json2Object(){
         String json = "{\"Id\":1,\"Age\":24,\"Price\":23.0,\"Ok\":true,\"Date\":\"2018-11-12 23:54:08\"}";
-        System.out.println(JsonUtils.jsonString2Object(json,TempObject.class));
-        final TempObject o = (TempObject) JsonUtils.jsonString2Object(json, TempObject.class);
+        System.out.println(JsonUtils.json2Object(json,TempObject.class));
+
+
+        final TempObject o = (TempObject) JsonUtils.json2Object(json, TempObject.class);
         System.out.println(o);
+    }
+
+    @Test
+    public void jsonList2List(){
+        System.out.println(JsonUtils.json2Array(jsonList,TempObject.class));
+
+        final List<TempObject> o = JsonUtils.json2Array(jsonList, TempObject.class);
+        System.out.println(o);
+
+    }
+
+    @Test
+    public void jsonArray2JSONArray(){
+        System.out.println(JsonUtils.jsonArray2JSONArray(jsonList));
+
+        final JSONArray o =  JsonUtils.jsonArray2JSONArray(jsonList);
+        o.forEach(System.out::println);
+
+        final List<TempObject> tempObjects = o.toJavaList(TempObject.class);
+        System.out.println(tempObjects);
+
     }
 }
