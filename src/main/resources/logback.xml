@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="AppName" value="J-tool"/>
+
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%highlight(%d{yyyy-MM-dd HH:mm:ss.SSS})|-%highlight(%-5level)| %boldYellow(%thread)| %green(%logger{36}) - %cyan(%msg%n)"/>
+
+    <property name="FILE_PATH" value="/opt/applog/jtool"/>
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}|-%-5level| %thread| %logger{36} - %msg%n"/>
+
+    <contextName>${AppName}</contextName>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- 保存日志到本地 -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${FILE_PATH}/LOG.log</file>
+        <!--<append>：如果是 true，日志被追加到文件结尾，如果是 false，清空现存文件，默认是true。-->
+        <append>true</append>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 每天生成日志 -->
+    <appender name="FILE_DAY" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${FILE_PATH}/LOG_info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${FILE_PATH}/LOG_info.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!-- 只输出ERROR级别日志 -->
+    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${FILE_PATH}/LOG_error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${FILE_PATH}/LOG_info.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+
+
+    <!--<logger name="com.xinchen.java.tools" level="INFO">-->
+        <!--<appender-ref ref="FILE_DAY"/>-->
+        <!--<appender-ref ref="FILE_ERROR"/>-->
+    <!--</logger>-->
+
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
