@@ -6,12 +6,13 @@ import com.alibaba.fastjson.JSONArray;
 import java.util.List;
 
 /**
+ * FastJson工具类
  * @author Xin Chen (xinchenmelody@gmail.com)
  * @version 1.0
  * @date Created In 2018/11/12 23:21
  */
 
-public class JsonUtils {
+public class FastJsonUtils {
     public static String object2Json(Object o) {
         return JSON.toJSONString(o);
     }
