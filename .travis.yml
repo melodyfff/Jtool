@@ -1,3 +1,4 @@
 language: java
 script:
+  - cd copy-utils
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
