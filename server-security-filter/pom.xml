@@ -17,6 +17,7 @@
     <servlet.version>3.1.0</servlet.version>
     <logback.version>1.2.3</logback.version>
     <jcl-over-slf4j.version>1.7.24</jcl-over-slf4j.version>
+    <jul-to-slf4j.version>1.7.25</jul-to-slf4j.version>
     <junit.version>4.12</junit.version>
     <mockito.version>1.10.8</mockito.version>
   </properties>
@@ -27,11 +28,16 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+    </dependency>
     <!--*************************************-->
     <!--        Spring Dependency            -->
     <!--*************************************-->
@@ -83,6 +89,13 @@
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${jcl-over-slf4j.version}</version>
+      </dependency>
+
+      <!--  -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-to-slf4j</artifactId>
+        <version>${jul-to-slf4j.version}</version>
       </dependency>
 
       <dependency>
