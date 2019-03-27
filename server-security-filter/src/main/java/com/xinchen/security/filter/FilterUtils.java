@@ -23,17 +23,31 @@ public final class FilterUtils {
     private FilterUtils() {
     }
 
+    /**
+     * 转换String字符串为boolean
+     * @param string2Parse true/false
+     * @return boolean
+     */
     public static boolean parseStringToBooleanDefaultingToFalse(final String string2Parse) {
         return Boolean.parseBoolean(string2Parse);
     }
 
 
-
+    /**
+     * 配置日志处理
+     * @param loggerHandlerClassName loggerHandlerClassName
+     * @param logger logger
+     */
     public static void configureLogging(final String loggerHandlerClassName, final Logger logger) {
         final Handler handler = loadLoggerHandlerByClassName(loggerHandlerClassName);
         configureLogging(handler, logger);
     }
 
+    /**
+     * 配置日志处理
+     * @param handler handler
+     * @param logger logger
+     */
     public static void configureLogging(final Handler handler, final Logger logger) {
         for (final Handler h : logger.getHandlers()) {
             logger.removeHandler(h);
@@ -66,6 +80,11 @@ public final class FilterUtils {
 
     }
 
+    /**
+     * 打印异常信息，通过 throwOnErrors 判断是否继续抛出异常
+     * @param logger logger
+     * @param ex Exception
+     */
     public static void logException(final Logger logger, final Exception ex) {
         logger.log(Level.SEVERE, ex.getMessage(), ex);
         if (throwOnErrors) {
@@ -73,6 +92,11 @@ public final class FilterUtils {
         }
     }
 
+    /**
+     * 通过加载日志处理器
+     * @param loggerHandlerClassName  loggerHandlerClassName
+     * @return {@link java.util.logging.Handler}
+     */
     private static Handler loadLoggerHandlerByClassName(final String loggerHandlerClassName) {
         try {
             if (loggerHandlerClassName == null) {
