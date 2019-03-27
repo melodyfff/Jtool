@@ -16,6 +16,7 @@ public final class FilterUtils {
     private static final Logger LOGGER = Logger.getLogger(FilterUtils.class.getName());
 
     /**
+     * default : false
      * throw the errors (RuntimeException)
      */
     public static boolean throwOnErrors;
