@@ -24,6 +24,10 @@ public final class FilterUtils {
     private FilterUtils() {
     }
 
+    public static void setThrowOnErrors(final boolean throwOnErrors) {
+        FilterUtils.throwOnErrors = throwOnErrors;
+    }
+
     /**
      * 转换String字符串为boolean
      * @param string2Parse true/false

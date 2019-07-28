@@ -8,6 +8,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
@@ -82,6 +83,11 @@ public class RequestParameterPolicyEnforcementFilter extends AbstractSecurityFil
     public static final String ONLY_POST_PARAMETERS = "onlyPostParameters";
 
     /**
+     * 指定该配置的可选Filter init-param的名称，错误应该是致命的
+     */
+    public static final String FAIL_SAFE = "failSafe";
+
+    /**
      * 要检查的参数名称集合，空集表示检查所有参数
      * <p>
      * Set of parameter names to check.
@@ -128,6 +134,12 @@ public class RequestParameterPolicyEnforcementFilter extends AbstractSecurityFil
         this.onlyPostParameters = onlyPostParameters;
     }
 
+    public void setFailSafe(boolean failSafe) {
+        // if configured to fail safe, make configuration errors fatal so that
+        // this filter will not init() with known-problematic configuration.
+        FilterUtils.setThrowOnErrors(failSafe);
+    }
+
     public RequestParameterPolicyEnforcementFilter() {
         // 配置日志
         FilterUtils.configureLogging(getLoggerHandlerClassName(), LOGGER);
@@ -145,6 +157,15 @@ public class RequestParameterPolicyEnforcementFilter extends AbstractSecurityFil
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         FilterUtils.configureLogging(getLoggerHandlerClassName(), LOGGER);
+
+        // 首先配置failSafe，因为它指定了后续配置错误的后果
+        final String failSafeParam = filterConfig.getInitParameter(FAIL_SAFE);
+
+        if (null != failSafeParam) {
+            setFailSafe(FilterUtils.parseStringToBooleanDefaultingToFalse(failSafeParam));
+        }
+
+
         // 验证没有配置无法识别的init参数
         // 因为无法识别的init参数可能是尝试以重要方式配置此过滤器的采用者
         // 并意外忽略该意图可能会产生安全隐患。
@@ -195,47 +216,73 @@ public class RequestParameterPolicyEnforcementFilter extends AbstractSecurityFil
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         try {
             // 针对HttpServletRequest请求
-            if (request instanceof HttpServletRequest){
+            if (request instanceof HttpServletRequest) {
                 final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 
                 // immutable map from String param name --> String[] parameter values
-                final Map<String,String[]> parameterMap = httpServletRequest.getParameterMap();
+                final Map<String, String[]> parameterMap = httpServletRequest.getParameterMap();
 
                 // which parameters *on this request* ought to be checked.
                 final Set<String> parametersToCheckHere;
 
-                if (this.parametersToCheck.isEmpty()){
-                    // 空集表示检查所有参数
+                if (this.parametersToCheck.isEmpty()) {
                     // the special meaning of empty is to check *all* the parameters, so
                     parametersToCheckHere = parameterMap.keySet();
                 } else {
                     parametersToCheckHere = this.parametersToCheck;
                 }
 
-
-                if (!this.allowMultiValueParameters){
-
+                if (!this.allowMultiValueParameters) {
+                    // 检查多值参数
+                    requireNotMultiValued(parametersToCheckHere, parameterMap);
                 }
+                // 检查该值是否包含禁止的字符
+                enforceParameterContentCharacterRestrictions(parametersToCheckHere, this.charactersToForbid, parameterMap);
 
-
+                // 检查某些参数是否应仅在POST请求中（根据配置）
+                checkOnlyPostParameters(httpServletRequest.getMethod(), parameterMap, this.onlyPostParameters);
             }
-        } catch (final Exception e){
-            // translate to a ServletException to meet the typed expectations of the Filter API.
+        } catch (final Exception e) {
+            // 转换为ServletException以满足Filter API的类型期望
             FilterUtils.logException(LOGGER, new ServletException(getClass().getSimpleName() + " is blocking this request.  Examine the cause in" +
                     " this stack trace to understand why.", e));
         }
+
+        chain.doFilter(request, response);
     }
 
     @Override
     public void destroy() {
-
+        // do nothing
     }
 
     /* ========================================================================================================== */
     /* Init parameter parsing */
 
+    /**
+     * 检查Filter init参数名称，如果它们包含无法识别，则抛出ServletException
+     *
+     * @param initParamNames 实际上是从FilterConfig中读取的
+     * @throws ServletException 如果存在无法识别的参数名称
+     */
     static void throwIfUnrecognizedParamName(Enumeration initParamNames) throws ServletException {
+        final Set<String> recognizedParameterNames = new HashSet<String>();
+        recognizedParameterNames.add(ALLOW_MULTI_VALUED_PARAMETERS);
+        recognizedParameterNames.add(PARAMETERS_TO_CHECK);
+        recognizedParameterNames.add(ONLY_POST_PARAMETERS);
+        recognizedParameterNames.add(CHARACTERS_TO_FORBID);
+        recognizedParameterNames.add(FAIL_SAFE);
+        recognizedParameterNames.add(LOGGER_HANDLER_CLASS_NAME);
 
+        while (initParamNames.hasMoreElements()) {
+            final String initParamName = (String) initParamNames.nextElement();
+            if (!recognizedParameterNames.contains(initParamName)) {
+                FilterUtils.logException(LOGGER, new ServletException("Unrecognized init parameter [" + initParamName + "].  Failing safe.  Typo" +
+                        " in the web.xml configuration? " +
+                        " Misunderstanding about the configuration "
+                        + RequestParameterPolicyEnforcementFilter.class.getSimpleName() + " expects?"));
+            }
+        }
     }
 
     /**
@@ -339,4 +386,110 @@ public class RequestParameterPolicyEnforcementFilter extends AbstractSecurityFil
         }
         return charactersToForbid;
     }
+
+    /* ========================================================================================================== */
+    /* Filtering requests */
+
+    /**
+     * 对于要检查的每个参数，请验证它是否为零或一个值。
+     * <p>
+     * 要检查的参数集可以为空。
+     * 参数map可能不包含任何要检查的给定参数。
+     * <p>
+     * 此方法是一个实现细节，不是公开的API。
+     * 此方法只是非私有的，以允许JUnit测试。
+     * <p>
+     * <p>
+     * 静态，无状态方法。
+     *
+     * @param parametersToCheck non-null potentially empty Set of String names of parameters
+     * @param parameterMap      non-null Map from String name of parameter to String[] values
+     * @throws IllegalStateException if a parameterToCheck is present in the parameterMap with multiple values.
+     */
+    static void requireNotMultiValued(final Set<String> parametersToCheck, final Map parameterMap) {
+
+        for (final String parameterName : parametersToCheck) {
+            if (parameterMap.containsKey(parameterName)) {
+                final String[] values = (String[]) parameterMap.get(parameterName);
+                if (values.length > 1) {
+                    FilterUtils.logException(LOGGER, new IllegalStateException("Parameter [" + parameterName + "] had multiple values [" +
+                            Arrays.toString(values) + "] but at most one value is allowable."));
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 对于要检查的每个参数，对于该参数的每个值，检查该值是否包含禁止的字符。
+     * <p>
+     * 这是一种无状态静态方法。
+     * <p>
+     * 此方法是一个实现细节，不是公开的API。
+     * 此方法只是非私有的，以允许JUnit测试。
+     *
+     * @param parametersToCheck  Set of String request parameter names to look for
+     * @param charactersToForbid Set of Character characters to forbid
+     * @param parameterMap       String --> String[] Map, in practice as read from ServletRequest
+     */
+    static void enforceParameterContentCharacterRestrictions(
+            final Set<String> parametersToCheck, final Set<Character> charactersToForbid, final Map parameterMap) {
+
+        if (charactersToForbid.isEmpty()) {
+            // short circuit
+            return;
+        }
+
+        for (final String parameterToCheck : parametersToCheck) {
+
+            final String[] parameterValues = (String[]) parameterMap.get(parameterToCheck);
+
+            if (null != parameterValues) {
+
+                for (final String parameterValue : parameterValues) {
+
+                    for (final Character forbiddenCharacter : charactersToForbid) {
+
+                        final StringBuilder characterAsStringBuilder = new StringBuilder();
+                        characterAsStringBuilder.append(forbiddenCharacter);
+
+                        if (parameterValue.contains(characterAsStringBuilder)) {
+                            FilterUtils.logException(LOGGER, new IllegalArgumentException("Disallowed character [" + forbiddenCharacter
+                                    + "] found in value [" + parameterValue + "] of parameter named ["
+                                    + parameterToCheck + "]"));
+                        }
+
+                        // that forbiddenCharacter was not in this parameterValue
+                    }
+
+                    // none of the charactersToForbid were in this parameterValue
+                }
+
+                // none of the values of this parameterToCheck had a forbidden character
+            } // or this parameterToCheck had null value
+
+        }
+
+        // none of the values of any of the parametersToCheck had a forbidden character
+        // hurray! allow flow to continue without throwing an Exception.
+    }
+
+    /**
+     * 检查某些参数是否应仅在POST请求中（根据配置）。
+     *
+     * @param method             the method of the request
+     * @param parameterMap       all the request parameters
+     * @param onlyPostParameters parameters that should only be in POST requests
+     */
+    static void checkOnlyPostParameters(final String method, final Map parameterMap, final Set<String> onlyPostParameters) {
+        if (!"POST".equals(method)) {
+            Set<String> names = parameterMap.keySet();
+            for (String onlyPostParameter : onlyPostParameters) {
+                if (names.contains(onlyPostParameter)) {
+                    FilterUtils.logException(LOGGER, new IllegalArgumentException(onlyPostParameter + " parameter should only be used in POST requests"));
+                }
+            }
+        }
+    }
+
 }
