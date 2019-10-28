@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="AppName" value="common-pool"/>
+    <property name="CONSOLE_LOG_PATTERN" value="%highlight(%d{yyyy-MM-dd HH:mm:ss.SSS})|-%highlight(%-5level)| %boldYellow(%thread)| %green(%logger{36}) - %msg%n"/>
+    <property name="CONSOLE_LOG_PATTERN_INFO" value="%boldRed(%d{yyyy-MM-dd HH:mm:ss.SSS})|-%boldBlue(%-5level)| %boldGreen(%thread)| %boldCyan(%logger{36}) - %msg %n"/>
+    <property name="CONSOLE_LOG_PATTERN_DEBUG" value="%boldRed(%d{yyyy-MM-dd HH:mm:ss.SSS})|-%boldBlue(%-5level)| %boldGreen(%thread)| %boldCyan(%logger{36}) %boldMagenta([%M:%L]) - %msg %n"/>
+
+    <contextName>${AppName}</contextName>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
