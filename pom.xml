@@ -12,6 +12,7 @@
     <modules>
         <module>common-pool</module>
         <module>io</module>
+        <module>httpclient</module>
     </modules>
 
     <properties>
