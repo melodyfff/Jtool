@@ -13,6 +13,7 @@
         <module>common-pool</module>
         <module>io</module>
         <module>httpclient</module>
+        <module>thread</module>
     </modules>
 
     <properties>
