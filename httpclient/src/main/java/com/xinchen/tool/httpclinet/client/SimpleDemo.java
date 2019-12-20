@@ -1,4 +1,4 @@
-package com.xinchen.tool.httpclinet;
+package com.xinchen.tool.httpclinet.client;
 
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.HttpRequestRetryHandler;
@@ -16,6 +16,10 @@ import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.UnknownHostException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
@@ -29,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * @version 1.0
  * @date 19/12/2019 14:34
  */
-public final class HttpClientUtil {
+public final class SimpleDemo {
 
     private static final CloseableHttpClient CLIENT;
 
@@ -90,17 +94,24 @@ public final class HttpClientUtil {
     }
 
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        for (int i = 0; i < 10; i++) {
-            new Thread(() -> {
-                System.out.println(CLIENT);
-                try (final CloseableHttpResponse execute = CLIENT.execute(new HttpGet("http://www.baidu.com"))){
-                    System.out.println(execute.getStatusLine());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+    public static void main(String[] args){
+
+        Callable<Void> task = () -> {
+            System.out.println(String.format("%s is running , Client %s",Thread.currentThread().getName(),CLIENT));
+            try (final CloseableHttpResponse response = CLIENT.execute(new HttpGet("http://www.baidu.com"))){
+                System.out.println(response);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        };
+
+        ExecutorService executorService = new ThreadPoolExecutor(10, 10, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+
+        for (int i = 0; i < 100; i++) {
+            executorService.submit(task);
         }
-        TimeUnit.SECONDS.sleep(10);
+
+        executorService.shutdown();
     }
 }
