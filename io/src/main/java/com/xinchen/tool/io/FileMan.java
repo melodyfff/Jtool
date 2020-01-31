@@ -1,10 +1,12 @@
 package com.xinchen.tool.io;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -12,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * 文件处理帮助类
@@ -133,6 +137,48 @@ public class FileMan {
             try ( final ByteArrayOutputStream bot= new ByteArrayOutputStream()){
                 bot.write(Base64.getDecoder().decode(byteString.getBytes()));
                 bot.writeTo(fileOutputStream);
+            }
+        }
+    }
+
+    /**
+     * 对字符串进行gzip压缩
+     * @param s 等待压缩的字符串 string
+     * @param inEncoding 字符串编码格式
+     * @return 压缩后的字符串
+     * @throws IOException IOException
+     */
+    public static String gzip(String s, Charset inEncoding) throws IOException {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            GZIPOutputStream gzip = new GZIPOutputStream(bos);
+            gzip.write(s.getBytes(inEncoding));
+            // 这里一定要关闭，不然回报 java.io.EOFException: Unexpected end of ZLIB input stream
+            gzip.close();
+            // 编码ISO-8859-1不要进行修改，否则会导致java.util.zip.ZipException: Not in GZIP format异常
+            return bos.toString(StandardCharsets.ISO_8859_1.name());
+        }
+
+    }
+
+    /**
+     * 对字符串进行gzip解压
+     * @param s 压缩过的字符串 string
+     * @param outEncoding 返回的解压后的字符串编码格式
+     * @return 解压后的字符
+     * @throws IOException IOException
+     */
+    public static String unGzip(String s, Charset outEncoding) throws IOException {
+        // 编码ISO-8859-1不要进行修改，否则会导致java.util.zip.ZipException: Not in GZIP format异常
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(s.getBytes(StandardCharsets.ISO_8859_1.name()))) {
+            try (GZIPInputStream gis = new GZIPInputStream(bis)) {
+                try (ByteArrayOutputStream bos = new ByteArrayOutputStream()){
+                    int len;
+                    byte[] buffer = new byte[1024];
+                    while ((len = gis.read(buffer)) != -1) {
+                        bos.write(buffer, 0, len);
+                    }
+                    return bos.toString(outEncoding.name());
+                }
             }
         }
     }
