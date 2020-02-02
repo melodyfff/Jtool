@@ -1,7 +1,7 @@
-package com.xinchen.tool.pipeline.scheduler;
+package com.xinchen.tool.pipeline.mode1.scheduler;
 
-import com.xinchen.tool.pipeline.pipeline.Request;
-import com.xinchen.tool.pipeline.pipeline.Task;
+import com.xinchen.tool.pipeline.mode1.pipeline.Request;
+import com.xinchen.tool.pipeline.mode1.pipeline.Task;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

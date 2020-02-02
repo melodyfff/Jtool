@@ -1,4 +1,4 @@
-package com.xinchen.tool.pipeline.pipeline;
+package com.xinchen.tool.pipeline.mode1.pipeline;
 
 /**
  *

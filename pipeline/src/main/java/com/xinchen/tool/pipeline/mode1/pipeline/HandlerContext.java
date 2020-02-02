@@ -1,4 +1,4 @@
-package com.xinchen.tool.pipeline.pipeline;
+package com.xinchen.tool.pipeline.mode1.pipeline;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +17,6 @@ public class HandlerContext {
     Handler handler;
 
     private Task task;
-
 
     public void fireTaskReceived(Request request) {
         log.debug("进入[{}] -> 触发 pipeline -> 接收到任务 fireTaskReceived",this.getClass().getName());
@@ -44,7 +43,7 @@ public class HandlerContext {
      * @param request Request 业务请求封装
      */
     static void invokeTaskReceived(HandlerContext ctx, Request request){
-        if (null!=ctx){
+        if (checkHandlerContext(ctx)) {
             try {
                 ctx.handler().receiveTask(ctx,request);
             } catch (Throwable e){
@@ -60,7 +59,7 @@ public class HandlerContext {
      * @param task Task
      */
     static void invokeTaskExecuted(HandlerContext ctx, Task task) {
-        if (null != ctx) {
+        if (checkHandlerContext(ctx)) {
             try {
                 ctx.handler().executeTask(ctx, task);
             } catch (Exception e) {
@@ -75,7 +74,7 @@ public class HandlerContext {
      * @param task Task
      */
     static void invokeTaskFiltered(HandlerContext ctx, Task task) {
-        if (null != ctx) {
+        if (checkHandlerContext(ctx)) {
             try {
                 ctx.handler().filterTask(ctx, task);
             } catch (Throwable e) {
@@ -85,7 +84,7 @@ public class HandlerContext {
     }
 
     static void invokeAfterCompletion(HandlerContext ctx) {
-        if (null != ctx) {
+        if (checkHandlerContext(ctx)) {
             ctx.handler().afterCompletion(ctx);
         }
     }
@@ -94,7 +93,11 @@ public class HandlerContext {
         return next;
     }
 
-    private Handler handler(){
+    Handler handler(){
         return handler;
+    }
+
+    static boolean checkHandlerContext(HandlerContext ctx){
+        return null != ctx && ctx.handler().isSupport();
     }
 }

@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>pipelinen</artifactId>
+  <artifactId>pipeline</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <name>pipeline</name>

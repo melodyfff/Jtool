@@ -1,4 +1,4 @@
-package com.xinchen.tool.pipeline.pipeline;
+package com.xinchen.tool.pipeline.mode1.pipeline;
 
 /**
  * 在未加入节点的时候会存在三个HandlerContext
@@ -14,7 +14,7 @@ package com.xinchen.tool.pipeline.pipeline;
  */
 public class DefaultPipeline implements Pipeline{
     /** 创建一个默认的handler，将其注入到首尾两个节点的HandlerContext中，其作用只是将链往下传递*/
-    private static final Handler DEFAULT_HANDLER = new Handler() {};
+    private static final Handler DEFAULT_HANDLER = () -> true;
     /**
      * 创建一个头结点和尾节点，这两个节点内部没有做任何处理，只是默认的将每一层级的链往下传递，
      * 这里头结点和尾节点的主要作用就是用于标志整个链的首尾，所有的业务节点都在这两个节点中间
@@ -40,6 +40,14 @@ public class DefaultPipeline implements Pipeline{
         head.next = tail;
         tail.pre = head;
     }
+
+
+//    public void invoke(){
+//        fireTaskReceived();
+//        fireTaskFiltered();
+//        fireTaskExecuted();
+//        fireAfterCompletion();
+//    }
 
     /**
      * 这里我们可以看到，每一层级的调用都是通过HandlerContext.invokeXXX(head)的方式进行的，

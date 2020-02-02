@@ -1,9 +1,8 @@
-package com.xinchen.tool.pipeline.pipeline.example;
+package com.xinchen.tool.pipeline.mode1.pipeline.example;
 
-import com.xinchen.tool.pipeline.pipeline.DefaultPipeline;
-import com.xinchen.tool.pipeline.pipeline.Pipeline;
-import com.xinchen.tool.pipeline.pipeline.Request;
-import com.xinchen.tool.pipeline.pipeline.Task;
+import com.xinchen.tool.pipeline.mode1.pipeline.DefaultPipeline;
+import com.xinchen.tool.pipeline.mode1.pipeline.Pipeline;
+import com.xinchen.tool.pipeline.mode1.pipeline.Request;
 
 /**
  * @author Xin Chen (xinchenmelody@gmail.com)
@@ -20,9 +19,6 @@ public class Client {
         pipeline
                 .addLast(new Example1Handler("测试1"))
                 .addLast(new Example2Handler("测试2"))
-                .fireTaskReceived()
-                .fireTaskFiltered()
-                .fireTaskExecuted()
-                .fireAfterCompletion();
+                .invoke();
     }
 }

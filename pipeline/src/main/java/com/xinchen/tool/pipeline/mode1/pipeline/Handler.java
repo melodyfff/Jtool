@@ -1,4 +1,4 @@
-package com.xinchen.tool.pipeline.pipeline;
+package com.xinchen.tool.pipeline.mode1.pipeline;
 
 /**
  * @author Xin Chen (xinchenmelody@gmail.com)
@@ -51,4 +51,6 @@ public interface Handler{
     default void exceptionCaught(HandlerContext ctx, Throwable e) {
         throw new RuntimeException(e);
     }
+
+    boolean isSupport();
 }

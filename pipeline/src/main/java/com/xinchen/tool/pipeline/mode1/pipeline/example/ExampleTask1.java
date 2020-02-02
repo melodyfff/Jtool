@@ -1,6 +1,6 @@
-package com.xinchen.tool.pipeline.pipeline.example;
+package com.xinchen.tool.pipeline.mode1.pipeline.example;
 
-import com.xinchen.tool.pipeline.pipeline.Task;
+import com.xinchen.tool.pipeline.mode1.pipeline.Task;
 
 /**
  * @author Xin Chen (xinchenmelody@gmail.com)

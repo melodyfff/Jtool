@@ -1,9 +1,9 @@
-package com.xinchen.tool.pipeline.pipeline.example;
+package com.xinchen.tool.pipeline.mode1.pipeline.example;
 
-import com.xinchen.tool.pipeline.pipeline.Handler;
-import com.xinchen.tool.pipeline.pipeline.HandlerContext;
-import com.xinchen.tool.pipeline.pipeline.Request;
-import com.xinchen.tool.pipeline.pipeline.Task;
+import com.xinchen.tool.pipeline.mode1.pipeline.Handler;
+import com.xinchen.tool.pipeline.mode1.pipeline.HandlerContext;
+import com.xinchen.tool.pipeline.mode1.pipeline.Request;
+import com.xinchen.tool.pipeline.mode1.pipeline.Task;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -12,10 +12,10 @@ import lombok.extern.slf4j.Slf4j;
  * @date Created In 2020/2/1 22:44
  */
 @Slf4j
-public class Example1Handler implements Handler {
+public class Example2Handler implements Handler {
     private final String name;
 
-    public Example1Handler(String name) {
+    public Example2Handler(String name) {
         this.name = name;
     }
 
@@ -27,7 +27,7 @@ public class Example1Handler implements Handler {
 
     @Override
     public void filterTask(HandlerContext ctx, Task task) {
-        if (task instanceof ExampleTask1) {
+        if (task instanceof ExampleTask2) {
             log.info("进入[{}] -> 触发 pipeline -> 过滤任务 [{}]", name, task.id());
             ctx.fireTaskFiltered(task);
         }
@@ -35,7 +35,7 @@ public class Example1Handler implements Handler {
 
     @Override
     public void executeTask(HandlerContext ctx, Task task) {
-        if (task instanceof ExampleTask1) {
+        if (task instanceof ExampleTask2) {
             log.info("进入[{}] -> 触发 pipeline -> 执行任务 [{}]", name, task.id());
             ctx.fireTaskExecuted(task);
         }
@@ -45,5 +45,10 @@ public class Example1Handler implements Handler {
     public void afterCompletion(HandlerContext ctx) {
         log.info("进入[{}] -> 触发 pipeline -> 任务结束 ", name);
         ctx.fireAfterCompletion(ctx);
+    }
+
+    @Override
+    public boolean isSupport() {
+        return false;
     }
 }
