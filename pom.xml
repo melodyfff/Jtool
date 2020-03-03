@@ -15,6 +15,7 @@
         <module>httpclient</module>
         <module>thread</module>
         <module>pipeline</module>
+        <module>netty</module>
     </modules>
 
     <properties>
