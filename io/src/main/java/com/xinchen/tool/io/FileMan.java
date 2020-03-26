@@ -27,6 +27,28 @@ import java.util.zip.GZIPOutputStream;
 public class FileMan {
 
     /**
+     * 拷贝文件
+     * @param orgFilePath 原文件路径
+     * @param desFilePath 目标文件路径
+     */
+    public static void copyFile(String orgFilePath,String desFilePath)  {
+        long star = System.currentTimeMillis();
+        try (FileInputStream in = new FileInputStream(new File(orgFilePath))){
+            try (FileOutputStream out = new FileOutputStream(new File(desFilePath))){
+                byte[] buff = new byte[in.available()];
+                final int len = in.read(buff);
+                System.out.println("size : "+len / 1024 +" kb");
+                out.write(buff);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            System.out.println("Cost: "+ (System.currentTimeMillis()-star)+" ms");
+        }
+    }
+
+
+    /**
      * 遍历文件路径，获取所有指定后缀的文件 ，如 .json .jpg .txt
      * @param filePath filePath文件路径
      * @param suffix 要搜寻的文件后缀
@@ -184,6 +206,7 @@ public class FileMan {
     }
 
     public static void main(String[] args) {
-        System.out.println(getFilePathStringsBySuffix("",".json"));
+//        System.out.println(getFilePathStringsBySuffix("",".json"));
+        copyFile("C:\\Users\\xinchen\\Desktop\\1.5829631538520048E9.gif","C:\\Users\\xinchen\\Desktop\\hh.gif");
     }
 }
