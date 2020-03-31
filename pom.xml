@@ -16,6 +16,7 @@
         <module>thread</module>
         <module>pipeline</module>
         <module>netty</module>
+        <module>reflections</module>
     </modules>
 
     <properties>
