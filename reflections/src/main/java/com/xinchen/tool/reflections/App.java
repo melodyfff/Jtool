@@ -1,5 +1,6 @@
 package com.xinchen.tool.reflections;
 
+import com.xinchen.tool.reflections.model.Base;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
@@ -38,6 +39,11 @@ public class App {
         );
 
 
+        // 指定接口的子类
+        final Set<Class<? extends Base>> subTypes = reflections.getSubTypesOf(Base.class);
+        log.info("指定接口 {} 的子类: {}",Base.class,subTypes);
+
+        // 获取资源文件
         final Set<String> resources = reflections.getResources(Pattern.compile(".*\\.properties"));
         log.info("获取资源文件结果： {}",resources);
     }
