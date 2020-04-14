@@ -17,6 +17,7 @@
         <module>pipeline</module>
         <module>netty</module>
         <module>reflections</module>
+        <module>disruptor</module>
     </modules>
 
     <properties>
