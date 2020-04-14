@@ -2,3 +2,9 @@
 **/.idea
 **/target
 **/*.iml
+
+**/.gradle
+**/gradle
+**/build
+**/gradlew
+**/gradlew.bat
