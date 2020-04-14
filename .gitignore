@@ -3,6 +3,7 @@
 **/target
 **/*.iml
 
+**/out
 **/.gradle
 **/gradle
 **/build
