@@ -15,4 +15,5 @@ include(':netty')
 include(':reflections')
 include(':disruptor')
 include 'jsoup'
+include 'guice'
 
