@@ -6,5 +6,5 @@ package com.xinchen.tool.reflections.model;
  * @version 1.0
  * @date 03/04/2020 16:43
  */
-public interface Base {
+public interface EntityBase {
 }
