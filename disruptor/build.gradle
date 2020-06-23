@@ -4,6 +4,8 @@
 
 dependencies {
     implementation 'com.lmax:disruptor:3.4.2'
+    compile group: 'junit', name: 'junit', version: '4.13'
+
 }
 
 description = 'disruptor'
