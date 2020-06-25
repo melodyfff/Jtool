@@ -14,7 +14,7 @@ import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.xinchen.tool.perftest.AbstractPerfTestDisruptor;
 import com.xinchen.tool.perftest.support.PerfTestUtil;
-import com.xinchen.tool.perftest.support.ValueAdditionEventHandler;
+import com.xinchen.tool.perftest.support.ValueEventHandlerAddition;
 import com.xinchen.tool.perftest.support.ValueEvent;
 
 /**
@@ -25,7 +25,7 @@ import com.xinchen.tool.perftest.support.ValueEvent;
  *     预期结果： (0 + 1 + 2 + 3 ... + ITERATIONS - 1) * BATCH_SIZE
  *
  *     生成包含long值的{@link ValueEvent},通过ringBuffer.publish()产生，由BatchEventProcessor<ValueEvent>事件处理进程去进行处理
- *     其中{@link ValueAdditionEventHandler}处理{@link ValueEvent}事件(accumulated Addition)，控制处理次数和进度，并持有最终计算结果
+ *     其中{@link ValueEventHandlerAddition}处理{@link ValueEvent}事件(accumulated Addition)，控制处理次数和进度，并持有最终计算结果
  *
  * </pre>
  *
@@ -83,7 +83,7 @@ public final class OneToOneSequencedBatchThroughputTest extends AbstractPerfTest
         Yielding strategy that uses a Thread.yield() */
     private final RingBuffer<ValueEvent> ringBuffer = createSingleProducer(ValueEvent.EVENT_FACTORY, BUFFER_SIZE, new YieldingWaitStrategy());
     private final SequenceBarrier sequenceBarrier = ringBuffer.newBarrier();
-    private final ValueAdditionEventHandler handler = new ValueAdditionEventHandler();
+    private final ValueEventHandlerAddition handler = new ValueEventHandlerAddition();
     private final BatchEventProcessor<ValueEvent> batchEventProcessor = new BatchEventProcessor<>(ringBuffer, sequenceBarrier, handler);
 
 

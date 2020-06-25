@@ -13,13 +13,13 @@ import java.util.concurrent.CountDownLatch;
  * @version 1.0
  * @date 24/06/2020 16:07
  */
-public class ValueMutationEventHandler implements EventHandler<ValueEvent> {
+public class ValueEventHandlerMutation implements EventHandler<ValueEvent> {
     private final Operation operation;
     private final PaddedLong value = new PaddedLong();
     private long count;
     private CountDownLatch latch;
 
-    public ValueMutationEventHandler(final Operation operation) {
+    public ValueEventHandlerMutation(final Operation operation) {
         this.operation = operation;
     }
 

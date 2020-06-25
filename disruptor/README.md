@@ -15,6 +15,8 @@ wiki: https://github.com/LMAX-Exchange/disruptor/wiki/Getting-Started
 ## 拓展阅读
 [高性能队列——Disruptor](https://tech.meituan.com/2016/11/18/disruptor.html)
 
+[Disruptor3.0的实现细节](https://www.cnblogs.com/daoqidelv/p/6995888.html)
+
 [蚂蚁金服分布式链路跟踪组件 SOFATracer 中 Disruptor 实践（含源码）](https://developer.aliyun.com/article/761347)
 
 [Disruptor的应用示例——大文件拆分](https://www.cnblogs.com/daoqidelv/p/7107474.html)

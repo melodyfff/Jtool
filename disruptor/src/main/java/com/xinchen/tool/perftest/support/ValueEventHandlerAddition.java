@@ -12,7 +12,7 @@ import java.util.concurrent.CountDownLatch;
  * @version 1.0
  * @date 23/06/2020 10:53
  */
-public final class ValueAdditionEventHandler implements EventHandler<ValueEvent> {
+public final class ValueEventHandlerAddition implements EventHandler<ValueEvent> {
     /** 根据cache line的特性，使用填充 */
     private final PaddedLong value = new PaddedLong();
     private long count;

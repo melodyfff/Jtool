@@ -8,7 +8,7 @@ import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.xinchen.tool.perftest.AbstractPerfTestDisruptor;
 import com.xinchen.tool.perftest.support.Operation;
 import com.xinchen.tool.perftest.support.ValueEvent;
-import com.xinchen.tool.perftest.support.ValueMutationEventHandler;
+import com.xinchen.tool.perftest.support.ValueEventHandlerMutation;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -83,13 +83,13 @@ public class OneToThreeSequencedThroughputTest extends AbstractPerfTestDisruptor
 
     private final RingBuffer<ValueEvent> ringBuffer = createSingleProducer(ValueEvent.EVENT_FACTORY, BUFFER_SIZE, new YieldingWaitStrategy());
     private final SequenceBarrier sequenceBarrier = ringBuffer.newBarrier();
-    private final ValueMutationEventHandler[] handlers = new ValueMutationEventHandler[NUM_EVENT_PROCESSORS];
+    private final ValueEventHandlerMutation[] handlers = new ValueEventHandlerMutation[NUM_EVENT_PROCESSORS];
 
     {
         // 创建3个事件处理(3个消费者)
-        handlers[0] = new ValueMutationEventHandler(Operation.ADDITION);
-        handlers[1] = new ValueMutationEventHandler(Operation.SUBTRACTION);
-        handlers[2] = new ValueMutationEventHandler(Operation.AND);
+        handlers[0] = new ValueEventHandlerMutation(Operation.ADDITION);
+        handlers[1] = new ValueEventHandlerMutation(Operation.SUBTRACTION);
+        handlers[2] = new ValueEventHandlerMutation(Operation.AND);
     }
 
     /** 批处理 Event Processor */

@@ -7,7 +7,7 @@ import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.xinchen.tool.perftest.AbstractPerfTestDisruptor;
 import com.xinchen.tool.perftest.support.PerfTestUtil;
-import com.xinchen.tool.perftest.support.ValueAdditionEventHandler;
+import com.xinchen.tool.perftest.support.ValueEventHandlerAddition;
 import com.xinchen.tool.perftest.support.ValueEvent;
 
 import java.util.concurrent.CountDownLatch;
@@ -62,7 +62,7 @@ public class OneToOneSequencedThroughputTest extends AbstractPerfTestDisruptor {
 
     private final RingBuffer<ValueEvent> ringBuffer = createSingleProducer(ValueEvent.EVENT_FACTORY, BUFFER_SIZE, new YieldingWaitStrategy());
     private final SequenceBarrier sequenceBarrier = ringBuffer.newBarrier();
-    private final ValueAdditionEventHandler handler = new ValueAdditionEventHandler();
+    private final ValueEventHandlerAddition handler = new ValueEventHandlerAddition();
     private final BatchEventProcessor<ValueEvent> batchEventProcessor = new BatchEventProcessor<>(ringBuffer, sequenceBarrier, handler);
 
 
