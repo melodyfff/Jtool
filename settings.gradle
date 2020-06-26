@@ -16,5 +16,6 @@ include(':reflections')
 include(':disruptor')
 include 'jsoup'
 include 'guice'
-include 'httptrace'
+// 这里需要依赖高版本gradle，暂时排除
+//include 'httptrace'
 
