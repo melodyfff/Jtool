@@ -61,7 +61,7 @@ public final class OneToThreeReleasingWorkerPoolThroughputTest extends AbstractP
 
     {
         // 这里需要特别注意
-        // workerPool中有个属性workSequence在创建子WorkProcessor时都传入了相同的一个workSequence用于控制当前处理的进度,相比于BatchEventProcessor充当SequenceBarrier的作用？
+        // workerPool中有个属性workSequence在创建子WorkProcessor时都传入了相同的一个workSequence用于控制当前处理的进度
         // 而在子WorkProcessor中有自己的sequence区别于workSequence
         // 这里的addGatingSequences,实质上为WorkProcessor的sequence
         ringBuffer.addGatingSequences(workerPool.getWorkerSequences());
