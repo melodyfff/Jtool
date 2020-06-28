@@ -8,7 +8,7 @@ import java.util.concurrent.CountDownLatch;
  * @version 1.0
  * @date Created In 2020/6/27 21:41
  */
-public final class ValueAdditionQueueProcessor implements Runnable {
+public final class ValueQueueProcessorAddition implements Runnable {
     private volatile boolean running;
     private long value;
     private long sequence;
@@ -17,7 +17,7 @@ public final class ValueAdditionQueueProcessor implements Runnable {
     private final BlockingQueue<Long> blockingQueue;
     private final long count;
 
-    public ValueAdditionQueueProcessor(final BlockingQueue<Long> blockingQueue, final long count) {
+    public ValueQueueProcessorAddition(final BlockingQueue<Long> blockingQueue, final long count) {
         this.blockingQueue = blockingQueue;
         this.count = count;
     }
@@ -46,7 +46,7 @@ public final class ValueAdditionQueueProcessor implements Runnable {
                 this.value += value;
 
                 // 控制执行次数
-                if (sequence++ == count) {
+                if (++sequence == count) {
                     latch.countDown();
                 }
             } catch (InterruptedException ex) {
