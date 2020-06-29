@@ -9,6 +9,9 @@ import com.xinchen.tool.perftest.support.util.PaddedLong;
 
 /**
  *
+ * 相关说明 ： https://github.com/LMAX-Exchange/disruptor/issues/181
+ *
+ *
  * {@link EventReleaseAware}修饰的类，在{@link WorkProcessor}初始化时,设置内部的{@link EventReleaser}
  * <pre>
  *     if (this.workHandler instanceof EventReleaseAware) {
@@ -37,7 +40,11 @@ public class EventCountingAndReleasingWorkHandler implements WorkHandler<ValueEv
     public void onEvent(final ValueEvent event) throws Exception {
         // 这里的EventReleaser实际为WorkProcessor的一个内部实现
         // 实际操作为 WorkProcessor.this.sequence.set(9223372036854775807L) 设置当前WorkProcessor中的sequence值为Long.MAX_VALUE
-        //
+        // 关于这个的用法可参考： https://github.com/LMAX-Exchange/disruptor/issues/181
+
+        // 这是一种向Disruptor发出信号的机制
+        // 表明workHandler已经获取了事件的副本，并且这个已经传入workHandler的事件已经不需要了，而且能被publisher覆盖
+        // 适用于some of the WorkHandlers are potentially quite slow
         eventReleaser.release();
         // 相当于自增1
         counters[index].set(counters[index].get() + 1L);
@@ -45,6 +52,7 @@ public class EventCountingAndReleasingWorkHandler implements WorkHandler<ValueEv
 
     @Override
     public void setEventReleaser(final EventReleaser eventReleaser) {
+        // 此处在WorkProcessor初始化时设置进来
         this.eventReleaser = eventReleaser;
     }
 }

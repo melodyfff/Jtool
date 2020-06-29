@@ -20,3 +20,5 @@ wiki: https://github.com/LMAX-Exchange/disruptor/wiki/Getting-Started
 [蚂蚁金服分布式链路跟踪组件 SOFATracer 中 Disruptor 实践（含源码）](https://developer.aliyun.com/article/761347)
 
 [Disruptor的应用示例——大文件拆分](https://www.cnblogs.com/daoqidelv/p/7107474.html)
+
+[一起聊聊Disruptor](https://zhuanlan.zhihu.com/p/21355046)

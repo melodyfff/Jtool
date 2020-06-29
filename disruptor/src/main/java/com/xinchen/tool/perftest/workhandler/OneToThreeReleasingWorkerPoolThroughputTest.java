@@ -16,12 +16,15 @@ import java.util.concurrent.Executors;
 import static com.xinchen.tool.perftest.support.PerfTestUtil.failIfNot;
 
 /**
+ *
+ * 相关说明 ： https://github.com/LMAX-Exchange/disruptor/issues/181
+ *
  * @author xinchen
  * @version 1.0
  * @date 28/06/2020 15:41
  */
 public final class OneToThreeReleasingWorkerPoolThroughputTest extends AbstractPerfTestDisruptor {
-    private static final int NUM_WORKERS = 1;
+    private static final int NUM_WORKERS = 3;
     private static final int BUFFER_SIZE = 1024 * 8;
     private static final long ITERATIONS = 1000L * 1000 * 10L;
     private final ExecutorService executor = Executors.newFixedThreadPool(NUM_WORKERS, DaemonThreadFactory.INSTANCE);
