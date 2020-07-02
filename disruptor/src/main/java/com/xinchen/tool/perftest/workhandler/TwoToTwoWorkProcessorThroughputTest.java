@@ -8,7 +8,6 @@ import com.lmax.disruptor.SequenceBarrier;
 import com.lmax.disruptor.WorkProcessor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.xinchen.tool.perftest.AbstractPerfTestDisruptor;
-import com.xinchen.tool.perftest.support.PerfTestUtil;
 import com.xinchen.tool.perftest.support.ValueWorkHandlerAddition;
 import com.xinchen.tool.perftest.support.ValueEvent;
 import com.xinchen.tool.perftest.support.ValuePublisher;
@@ -20,7 +19,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.LockSupport;
 
 import static com.lmax.disruptor.RingBuffer.createMultiProducer;
-import static com.xinchen.tool.perftest.support.PerfTestUtil.failIfNot;
 
 /**
  *
@@ -144,6 +142,7 @@ public class TwoToTwoWorkProcessorThroughputTest extends AbstractPerfTestDisrupt
 
         // 等待一些处理的慢的消费者执行完成
         // WorkProcessor中的workSequence里面存储的其实是下次要处理的event序号（还未被执行），对应的WorkProcessor里面的sequence，其实是已经处理过的事件的序号
+        // 在WorkerPool中每次start都会去调整workSequence，设置为ringBuffer.getCursor()的值
         while (workSequence.get() < expected) {
             LockSupport.parkNanos(1L);
         }
