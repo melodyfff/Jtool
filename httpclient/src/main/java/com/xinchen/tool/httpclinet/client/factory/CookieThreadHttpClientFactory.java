@@ -1,7 +1,6 @@
 package com.xinchen.tool.httpclinet.client.factory;
 
 import com.xinchen.tool.httpclinet.client.retry.DefaultRetryHandler;
-import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -9,7 +8,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
-import java.util.Arrays;
 
 /**
  *
@@ -43,8 +41,11 @@ public class CookieThreadHttpClientFactory extends BaseCloseableHttpClientFactor
 
         RequestConfig defaultRequestConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.DEFAULT)
+                // 默认 -1
                 .setConnectTimeout(1000)
+                // 默认 -1
                 .setConnectionRequestTimeout(1000)
+                // 默认 -1
                 .setSocketTimeout(1000)
                 .setExpectContinueEnabled(true)
                 .build();
