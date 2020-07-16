@@ -38,18 +38,42 @@ public class CookieThreadHttpClientFactory extends BaseCloseableHttpClientFactor
         cm.setMaxTotal(100);
         // 设置默认并发数
         cm.setDefaultMaxPerRoute(100);
+        // 检查空闲默认2000ms
+        cm.setValidateAfterInactivity(2000);
 
         RequestConfig defaultRequestConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.DEFAULT)
-                // 默认 -1
-                .setConnectTimeout(1000)
-                // 默认 -1
-                .setConnectionRequestTimeout(1000)
-                // 默认 -1
-                .setSocketTimeout(1000)
+                // 默认 -1 ms
+                .setConnectTimeout(5000)
+                // 默认 -1 ms
+                .setConnectionRequestTimeout(5000)
+                // 默认 -1 ms
+                .setSocketTimeout(5000)
                 .setExpectContinueEnabled(true)
                 .build();
 
+        return innerCreate(cm,defaultRequestConfig);
+    }
+
+    /**
+     * 创建支持多线程的带cookie存储的{@link CloseableHttpClient}
+     * @param cm PoolingHttpClientConnectionManager
+     * @param requestConfig RequestConfig
+     * @return CloseableHttpClient
+     */
+    public CloseableHttpClient create(PoolingHttpClientConnectionManager cm,
+                                      RequestConfig requestConfig) {
+        return innerCreate(cm, requestConfig);
+    }
+
+    /**
+     * 内部实际创建类
+     * @param cm PoolingHttpClientConnectionManager
+     * @param requestConfig RequestConfig
+     * @return CloseableHttpClient
+     */
+    private static CloseableHttpClient innerCreate(PoolingHttpClientConnectionManager cm,
+                                            RequestConfig requestConfig){
         return HttpClients.custom()
                 // 连接管理
                 .setConnectionManager(cm)
@@ -57,8 +81,9 @@ public class CookieThreadHttpClientFactory extends BaseCloseableHttpClientFactor
                 .setDefaultCookieStore(new BasicCookieStore())
                 // 默认重试策略
                 .setRetryHandler(new DefaultRetryHandler())
+//                .setConnectionManagerShared(true)
                 // 请求超时等设置
-                .setDefaultRequestConfig(defaultRequestConfig)
+                .setDefaultRequestConfig(requestConfig)
                 .build();
     }
 }

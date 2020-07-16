@@ -15,7 +15,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 public abstract class BaseCloseableHttpClientFactory implements AppHttpClientProvider {
     protected final CloseableHttpClient client;
 
-    protected BaseCloseableHttpClientFactory() {
+    BaseCloseableHttpClientFactory() {
         client = create();
     }
 
