@@ -1,4 +1,6 @@
 language: java
+install:
+  - ./gradlew build -x test
 script:
 #  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
   - gradle build -x test
