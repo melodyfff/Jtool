@@ -19,4 +19,5 @@ include 'guice'
 // 这里需要依赖高版本gradle，暂时排除
 //include 'httptrace'
 include 'redis-client'
+include 'hystrix'
 
