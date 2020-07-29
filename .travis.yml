@@ -1,6 +1,7 @@
 language: java
 install:
-  - ./gradlew build -x test
+  - chmod +x gradlew
+  - ./gradlew assemble
 script:
 #  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
   - gradle build -x test
