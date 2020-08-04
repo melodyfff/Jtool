@@ -26,15 +26,15 @@ import java.util.stream.Collectors;
 public class GitHubExample {
     public interface GitHub {
 
-        public class Repository {
+        class Repository {
             String name;
         }
 
-        public class Contributor {
+        class Contributor {
             String login;
         }
 
-        public class Issue {
+        class Issue {
 
             Issue() {
 

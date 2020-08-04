@@ -84,6 +84,8 @@ public class CookieThreadHttpClientFactory extends BaseCloseableHttpClientFactor
 //                .setConnectionManagerShared(true)
                 // 请求超时等设置
                 .setDefaultRequestConfig(requestConfig)
+                // 可通过添加拦截器来记录日志
+//                .addInterceptorFirst()
                 .build();
     }
 }

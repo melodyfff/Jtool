@@ -11,15 +11,22 @@ dependencies {
     // feign
     compile group: 'io.github.openfeign', name: 'feign-core', version: '11.0'
     compile group: 'io.github.openfeign', name: 'feign-gson', version: '11.0'
+    testCompile group: 'io.github.openfeign', name: 'feign-mock', version: '11.0'
+    // Java API for RESTful Web Services
+    testCompile group: 'io.github.openfeign', name: 'feign-jaxrs', version: '11.0'
+
     // jvm 监控指标的度量类库
     compile group: 'io.dropwizard.metrics5', name: 'metrics-core', version: '5.0.0'
+
     // Hamcrest是用于Java的单元测试的框架，它使用matcher匹配器来进行断言
     testCompile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
-    testCompile group: 'io.github.openfeign', name: 'feign-mock', version: '11.0'
 
+    // okhttp3
+    testCompile group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.8.0'
 
     // spring context
     implementation 'org.springframework:spring-context:5.2.0.RELEASE'
+    implementation 'org.springframework:spring-web:5.2.0.RELEASE'
 
 
     // html parse

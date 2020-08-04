@@ -1,6 +1,7 @@
 package com.xinchen.tool.fegin.github;
 
 import feign.Feign;
+import feign.Logger;
 import feign.Param;
 import feign.RequestLine;
 import feign.gson.GsonDecoder;
@@ -42,6 +43,8 @@ public class GitHubContributor {
     public static void main(String[] args) {
         GitHub github = Feign.builder()
                 .decoder(new GsonDecoder())
+                .logger(new Logger.ErrorLogger())
+                .logLevel(Logger.Level.BASIC)
                 .target(GitHub.class, "https://api.github.com");
 
         // Fetch and print a list of the contributors to this library.
