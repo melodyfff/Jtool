@@ -20,4 +20,5 @@ include 'guice'
 include 'httptrace'
 include 'redis-client'
 include 'hystrix'
+include 'rxjava'
 
