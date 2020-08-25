@@ -31,6 +31,12 @@ dependencies {
 
     // html parse
     compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
+
+    // guava
+    compile group: 'com.google.guava', name: 'guava', version: '24.1.1-jre'
+
+    // hystrix
+    compile group:'com.netflix.hystrix',name:'hystrix-core',version:'1.5.18'
 }
 
 description = 'httpclient'
