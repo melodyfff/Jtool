@@ -32,6 +32,9 @@ dependencies {
     // html parse
     compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
 
+    // assert
+    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.17.0'
+
     // guava
     compile group: 'com.google.guava', name: 'guava', version: '24.1.1-jre'
 

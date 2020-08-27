@@ -3,7 +3,6 @@ package com.xinchen.tool.fegin.hystrix;
 import com.netflix.hystrix.HystrixCommand;
 import feign.Contract;
 import feign.MethodMetadata;
-import org.graalvm.compiler.nodes.memory.MemoryCheckpoint;
 import rx.Completable;
 import rx.Observable;
 import rx.Single;
@@ -16,7 +15,6 @@ import java.util.concurrent.CompletableFuture;
 import static feign.Util.resolveLastTypeParameter;
 
 /**
- *
  * This special cases methods that return {@link HystrixCommand}, {@link Observable}, or
  * {@link Single} so that they are decoded properly.
  *
@@ -52,8 +50,8 @@ public class HystrixDelegatingContract implements Contract {
                 Type actualType = resolveLastTypeParameter(type, Observable.class);
                 metadata.returnType(actualType);
             } else if (type instanceof ParameterizedType
-                    && ((ParameterizedType) type).getRawType().equals(MemoryCheckpoint.Single.class)) {
-                Type actualType = resolveLastTypeParameter(type, MemoryCheckpoint.Single.class);
+                    && ((ParameterizedType) type).getRawType().equals(Single.class)) {
+                Type actualType = resolveLastTypeParameter(type, Single.class);
                 metadata.returnType(actualType);
             } else if (type instanceof ParameterizedType
                     && ((ParameterizedType) type).getRawType().equals(Completable.class)) {
@@ -63,6 +61,7 @@ public class HystrixDelegatingContract implements Contract {
                 metadata.returnType(resolveLastTypeParameter(type, CompletableFuture.class));
             }
         }
+
 
         return metadatas;
     }
