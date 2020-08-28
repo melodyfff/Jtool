@@ -95,6 +95,7 @@ final class HystrixInvocationHandler implements InvocationHandler {
             return toString();
         }
 
+        // 这里通过HystrixCommand包裹方法
         HystrixCommand<Object> hystrixCommand =
                 new HystrixCommand<Object>(setterMethodMap.get(method)) {
                     @Override

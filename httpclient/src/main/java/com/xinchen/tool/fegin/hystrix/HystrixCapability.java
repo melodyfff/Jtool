@@ -43,8 +43,8 @@ public class HystrixCapability implements Capability {
     }
 
     public <E> Capability fallback(Class<E> api, E fallback) {
+        // map to record api-fallback
         fallbacks.put(api, fallback);
-
         return this;
     }
 
