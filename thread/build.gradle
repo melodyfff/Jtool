@@ -3,3 +3,8 @@
  */
 
 description = 'thread'
+
+dependencies {
+    // https://mvnrepository.com/artifact/com.alibaba/transmittable-thread-local
+    compile group: 'com.alibaba', name: 'transmittable-thread-local', version: '2.11.5'
+}
