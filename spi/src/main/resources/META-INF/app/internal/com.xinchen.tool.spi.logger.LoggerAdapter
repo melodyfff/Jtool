@@ -1,0 +1,5 @@
+slf4j=com.xinchen.tool.spi.logger.slf4j.Slf4jLoggerAdapter
+jcl=com.xinchen.tool.spi.logger.jcl.JclLoggerAdapter
+log4j=com.xinchen.tool.spi.logger.log4j.Log4jLoggerAdapter
+jdk=com.xinchen.tool.spi.logger.jdk.JdkLoggerAdapter
+log4j2=com.xinchen.tool.spi.logger.log4j2.Log4j2LoggerAdapter

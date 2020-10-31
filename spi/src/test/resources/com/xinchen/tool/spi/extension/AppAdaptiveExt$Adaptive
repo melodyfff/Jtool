@@ -1,0 +1,12 @@
+package com.xinchen.tool.spi.extension.adaptive;
+import com.xinchen.tool.spi.extension.ExtensionLoader;
+public class AppAdaptiveExt$Adaptive implements com.xinchen.tool.spi.extension.adaptive.AppAdaptiveExt {
+public java.lang.String echo(com.xinchen.tool.spi.URL arg0, java.lang.String arg1)  {
+if (arg0 == null) throw new IllegalArgumentException("url == null");
+com.xinchen.tool.spi.URL url = arg0;
+String extName = url.getParameter("app.adaptive.ext", "impl");
+if(extName == null) throw new IllegalStateException("Failed to get extension (com.xinchen.tool.spi.extension.adaptive.AppAdaptiveExt) name from url (" + url.toString() + ") use keys([app.adaptive.ext])");
+com.xinchen.tool.spi.extension.adaptive.AppAdaptiveExt extension = (com.xinchen.tool.spi.extension.adaptive.AppAdaptiveExt)ExtensionLoader.getExtensionLoader(com.xinchen.tool.spi.extension.adaptive.AppAdaptiveExt.class).getExtension(extName);
+return extension.echo(arg0, arg1);
+}
+}

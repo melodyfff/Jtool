@@ -1,0 +1,1 @@
+slf4j=com.xinchen.tool.spi.logger.slf4j.Slf4jLoggerAdapter

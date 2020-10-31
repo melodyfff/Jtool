@@ -1,5 +1,7 @@
 package com.xinchen.tool.spi.extension;
 
+import com.xinchen.tool.spi.logger.Logger;
+import com.xinchen.tool.spi.logger.LoggerFactory;
 import com.xinchen.tool.spi.utlis.ReflectUtils;
 
 import java.lang.reflect.Method;
@@ -15,8 +17,9 @@ import java.lang.reflect.Modifier;
  */
 public class Injects {
 
+    private static final Logger log = LoggerFactory.getLogger(Injects.class);
 
-    public static <T> T injectExtension(ExtensionFactory objectFactory,T instance){
+    public static <T> T injectExtension(ExtensionFactory objectFactory,T instance,Class<?> type){
         //
         if (null == objectFactory){
             return instance;
@@ -51,13 +54,13 @@ public class Injects {
                     }
 
                 } catch (Exception e){
-                    // TODO logger.error("Failed to inject via method " + method.getName() + " of interface " + type.getName() + ": " + e.getMessage(), e);
+                    log.error("Failed to inject via method " + method.getName() + " of interface " + type.getName() + ": " + e.getMessage(), e);
                 }
 
 
             }
         } catch (Exception e){
-            // TODO logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         return instance;

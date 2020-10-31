@@ -1,0 +1,2 @@
+impl=com.xinchen.tool.spi.extension.adaptive.impl.AppAdaptiveExtImpl
+adaptive=com.xinchen.tool.spi.extension.adaptive.impl.AppAdaptiveExt_Manual_Adaptive

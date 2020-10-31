@@ -6,6 +6,9 @@ import com.xinchen.tool.spi.lang.Prioritized;
  *
  * 加载 ExtensionClasses 策略
  *
+ * JDK spi加载
+ * resources/META-INF/services/com.xinchen.tool.spi.extension.LoadingStrategy
+ *
  * @author xinchen
  * @version 1.0
  * @date 29/10/2020 15:34

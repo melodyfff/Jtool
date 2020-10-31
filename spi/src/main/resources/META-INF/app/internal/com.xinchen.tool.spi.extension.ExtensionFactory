@@ -1,0 +1,2 @@
+spi=com.xinchen.tool.spi.extension.factory.SpiExtensionFactory
+adaptive=com.xinchen.tool.spi.extension.factory.AdaptiveExtensionFactory

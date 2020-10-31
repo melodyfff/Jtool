@@ -3,8 +3,11 @@ package com.xinchen.tool.spi.extension;
 import com.xinchen.tool.spi.context.Lifecycle;
 import com.xinchen.tool.spi.extension.support.WrapperComparator;
 import com.xinchen.tool.spi.lang.Prioritized;
+import com.xinchen.tool.spi.logger.Logger;
+import com.xinchen.tool.spi.logger.LoggerFactory;
 import com.xinchen.tool.spi.utlis.ArrayUtils;
 import com.xinchen.tool.spi.utlis.ClassUtils;
+import com.xinchen.tool.spi.utlis.CollectionUtils;
 import com.xinchen.tool.spi.utlis.ConcurrentHashSet;
 import com.xinchen.tool.spi.utlis.StringUtils;
 
@@ -16,10 +19,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
@@ -35,6 +41,10 @@ public class ExtensionLoader<T> {
     //------------------------------------------------------------
     // Static FIELD
     //------------------------------------------------------------
+
+
+
+    private static final Logger log = LoggerFactory.getLogger(ExtensionLoader.class);
 
     /** 针对SPI注解中的value默认值提取的正则匹配,只允许一个默认值 */
     private static final Pattern NAME_SEPARATOR = Pattern.compile("\\s*[,]+\\s*");
@@ -59,7 +69,7 @@ public class ExtensionLoader<T> {
     // FIELD
     //------------------------------------------------------------
 
-    /** 缓存从Resource URL 中加载的类信息 ，加载的时候会被加上synchronized */
+    /** 缓存从Resource URL 中加载的类信息（含有@Adaptive注解的类和被Wrapper的类不会存在这里，会在其对应的缓存中） ，加载的时候会被加上synchronized */
     private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<>();
 
     /** 当loadClass的时候缓存@Activate标记的类的注解，格式为 key - Activate.class注解 */
@@ -141,8 +151,9 @@ public class ExtensionLoader<T> {
             return getDefaultExtension();
         }
 
-        // 从cachedInstances缓存中获取实例，如果未初始化则初始化
+        // 从cachedInstances Map缓存中获取实例，此时可能并未初始化，只是一个new Holder<>
         final Holder<Object> holder = getOrCreateHolder(name);
+
         Object instance = holder.get();
 
         // 实例是否已经初始化，未初始化则进行初始化
@@ -158,6 +169,26 @@ public class ExtensionLoader<T> {
         }
 
         return (T) instance;
+    }
+
+    public Set<String> getSupportedExtensions(){
+        // LoadClass()后的缓存cachedClasses
+        Map<String, Class<?>> extensionClasses = getExtensionClasses();
+        // 返回name的Set集合
+        return Collections.unmodifiableSet(new TreeSet<>(extensionClasses.keySet()));
+    }
+
+    public Set<T> getSupportedExtensionInstances(){
+        List<T> instances = new LinkedList<>();
+        final Set<String> supportedExtensions = getSupportedExtensions();
+        if (CollectionUtils.isNotEmpty(supportedExtensions)){
+            for (String name : supportedExtensions) {
+                instances.add(getExtension(name));
+            }
+        }
+        // sort the Prioritized instances
+        instances.sort(Prioritized.COMPARATOR);
+        return new LinkedHashSet<>(instances);
     }
 
     /**
@@ -197,7 +228,11 @@ public class ExtensionLoader<T> {
                 instance = cachedAdaptiveInstance.get();
                 if (null == instance){
                     try {
-                        // 尝试创建拓展
+                        // 1.尝试创建拓展 - 扫描 /META-INF/service  、/META-INF/app  、/META-INF/app/internal ...找寻该type.getName()的信息
+                        // 2.在loadClass()之后，cachedAdaptiveClass会有@Adaptive标记的类信息
+                        // 3.如果cachedAdaptiveClass==null则在createAdaptiveExtension()中根据 cachedDefaultName 动态生成class类信息，注意： 这里生成的类并不会加入到cachedAdaptiveClass缓存中去
+                        // 4.在createAdaptiveExtension()中完成拓展类IOC依赖setter填充。
+                        // 5.存入cachedAdaptiveInstance缓存中
                         instance = createAdaptiveExtension();
                         cachedAdaptiveInstance.set(instance);
                     } catch (Throwable t){
@@ -265,7 +300,7 @@ public class ExtensionLoader<T> {
             }
 
             // IOC 注入依赖
-            Injects.injectExtension(objectFactory,instance);
+            Injects.injectExtension(objectFactory,instance,type);
 
             // wrap对象处理
             if (wrap){
@@ -282,7 +317,7 @@ public class ExtensionLoader<T> {
                         Wrapper wrapper = wrapperClass.getAnnotation(Wrapper.class);
                         if (null == wrapper || (ArrayUtils.contains(wrapper.matches(),name) &&  !ArrayUtils.contains(wrapper.mismatches(), name) )){
                             // 根据wrapperClass反射初始化instance,再通过ioc setter依赖
-                            Injects.injectExtension(objectFactory, wrapperClass.getConstructor(type).newInstance(instance));
+                            Injects.injectExtension(objectFactory, wrapperClass.getConstructor(type).newInstance(instance) ,type);
                         }
 
                     }
@@ -304,25 +339,35 @@ public class ExtensionLoader<T> {
     private T createAdaptiveExtension(){
         try {
             // 尝试通过注入IOC的方式构造拓展
-            return Injects.injectExtension(objectFactory,(T)getAdaptiveExtensionClass().newInstance());
+            return Injects.injectExtension(objectFactory,(T)getAdaptiveExtensionClass().newInstance() ,type);
         } catch (Exception e){
             throw new IllegalStateException("Can't create adaptive extension " + type + ", cause: " + e.getMessage(), e);
         }
     }
 
     private Class<?> getAdaptiveExtensionClass(){
-        // 确保类加载到缓存cachedAdaptiveClass
+        // 确保类加载到缓存cachedAdaptiveClass, 在loadClass()中处理
         getExtensionClasses();
 
+        // 缓存中存在则说明该type下存在Class上有@Adaptive标记的类
         if(cachedAdaptiveClass != null){
             return cachedAdaptiveClass;
         }
 
+        // 没存在则可能没在/META-INF/app/internal 里面配置相关的拓展信息，尝试生成Class代码
         return cachedAdaptiveClass = createAdaptiveExtensionClass();
     }
 
     private Class<?> createAdaptiveExtensionClass() {
-        return null;
+        // 生成 Code
+        String code = new AdaptiveClassCodeGenerator(type, cachedDefaultName).generate();
+
+        // 优先选择当前线程的ClassLoader
+        ClassLoader classLoader = findClassLoader();
+
+        // 获取内置编译器生成Class
+        com.xinchen.tool.spi.compiler.Compiler compiler = ExtensionLoader.getExtensionLoader(com.xinchen.tool.spi.compiler.Compiler.class).getAdaptiveExtension();
+        return compiler.compile(code, classLoader);
     }
 
     /** 从cachedInstances中获取实例，此时可能并未初始化，只是一个new Holder<> */
@@ -475,9 +520,8 @@ public class ExtensionLoader<T> {
 
 
         } catch (Throwable t){
-            // TODO log
-//            logger.error("Exception occurred when loading extension class (interface: " +
-//                    type + ", description file: " + fileName + ").", t);
+            log.error("Exception occurred when loading extension class (interface: " +
+                    type + ", description file: " + fileName + ").", t);
         }
     }
 
@@ -520,6 +564,8 @@ public class ExtensionLoader<T> {
 
                         } catch (Throwable t){
                             IllegalStateException e = new IllegalStateException("Failed to load extension class (interface: " + type + ", class line: " + line + ") in " + resourceURL + ", cause: " + t.getMessage(), t);
+                            // 缓存错误信息，确保其他资源加载正常进行
+                            // 当getExtension() -> createExtension() 时会发现class为空，此时从findException（）获取错误信息
                             exceptions.put(line, e);
                         }
                     }
@@ -527,9 +573,8 @@ public class ExtensionLoader<T> {
                 }
             }
         } catch (Throwable t){
-            // TODO logger
-//            logger.error("Exception occurred when loading extension class (interface: " +
-//                    type + ", class file: " + resourceURL + ") in " + resourceURL, t);
+            log.error("Exception occurred when loading extension class (interface: " +
+                    type + ", class file: " + resourceURL + ") in " + resourceURL, t);
         }
     }
 
@@ -613,8 +658,7 @@ public class ExtensionLoader<T> {
         } else if (clazz != c){
             // 当发现 Holder<Map<String, Class<?>>> cachedClasses中的缓存类和类加载中的不一致时，表示重复加载，不是一个Single
             String duplicateMsg = "Duplicate extension " + type.getName() + " name " + name + " on " + c.getName() + " and " + clazz.getName();
-            // TODO logger
-//            logger.error(duplicateMsg);
+            log.error(duplicateMsg);
             throw new IllegalStateException(duplicateMsg);
         }
 
