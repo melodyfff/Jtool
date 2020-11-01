@@ -128,6 +128,11 @@ public class ExtensionLoader<T> {
             throw new IllegalArgumentException("Extension type (" + type + ") is not an interface!");
         }
 
+        if (!(type.isAnnotationPresent(SPI.class))) {
+            throw new IllegalArgumentException("Extension type (" + type +
+                    ") is not an extension, because it is NOT annotated with @" + SPI.class.getSimpleName() + "!");
+        }
+
         // 如果EXTENSION_LOADERS中没有该type,则以该type为key,新建一个ExtensionLoader(Class)为value，存入该map
         // 保证每个type对应的ExtensionLoader只被加载一次
         return (ExtensionLoader<T>) EXTENSION_LOADERS.computeIfAbsent(type, ExtensionLoader::new);
@@ -214,6 +219,14 @@ public class ExtensionLoader<T> {
         }
 
         return getExtension(cachedDefaultName);
+    }
+
+    /**
+     * Return default extension name, return <code>null</code> if not configured.
+     */
+    public String getDefaultExtensionName() {
+        getExtensionClasses();
+        return cachedDefaultName;
     }
 
     public T getAdaptiveExtension(){
@@ -358,6 +371,16 @@ public class ExtensionLoader<T> {
         return cachedAdaptiveClass = createAdaptiveExtensionClass();
     }
 
+    /**
+     * 创建拓展适配器类
+     *
+     * <p>
+     * 前提：
+     * 1. 必须有SPI的注解
+     * 2. 被SPI声明的接口中至少一个方法有Adaptive注解。
+     * </p>
+     * @return
+     */
     private Class<?> createAdaptiveExtensionClass() {
         // 生成 Code
         String code = new AdaptiveClassCodeGenerator(type, cachedDefaultName).generate();

@@ -8,4 +8,7 @@ package com.xinchen.tool.spi.constants;
  */
 public interface CommonConstants {
     String LOCALHOST_VALUE = "127.0.0.1";
+
+    String METHODS_KEY = "methods";
+    String METHOD_KEY = "method";
 }

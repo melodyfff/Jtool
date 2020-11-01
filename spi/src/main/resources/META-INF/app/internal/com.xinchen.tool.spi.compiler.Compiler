@@ -1,0 +1,3 @@
+adaptive=com.xinchen.tool.spi.compiler.support.AdaptiveCompiler
+jdk=com.xinchen.tool.spi.compiler.support.JdkCompiler
+javassist=com.xinchen.tool.spi.compiler.support.JavassistCompiler
