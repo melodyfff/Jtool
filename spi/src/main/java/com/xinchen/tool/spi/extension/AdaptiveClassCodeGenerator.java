@@ -17,6 +17,37 @@ import java.util.stream.IntStream;
  *
  * Code generator for Adaptive class
  *
+ * 当@SPI标记的接口里面的方法上有@Adaptive标记，并未指定value时， eg:
+ * <code>
+ * @SPI("impl1")
+ * public interface SimpleExt {
+ *     // @Adaptive example, do not specify a explicit key.
+ *     @Adaptive
+ *     String echo(URL url, String s);
+ *
+ *     @Adaptive({"key1", "key2"})
+ *     String yell(URL url, String s);
+ *
+ *     // no @Adaptive
+ *     String bang(URL url, int i);
+ * }
+ *
+ * 则生成的代码与以下接口相关类似
+ *
+ * <code>
+ * @SPI("impl1")
+ * public interface SimpleExt {
+ *     @Adaptive({"simple.ext"})
+ *     String echo(URL url, String s);
+ *
+ *     @Adaptive({"key1", "key2"})
+ *     String yell(URL url, String s);
+ * }
+ * </code>
+ *
+ * </code>
+ *
+ *
  * @author Xin Chen (xinchenmelody@gmail.com)
  * @version 1.0
  * @date Created In 2020/10/30 22:29

@@ -9,6 +9,12 @@ package com.xinchen.tool.spi.constants;
 public interface CommonConstants {
     String LOCALHOST_VALUE = "127.0.0.1";
 
+    String DEFAULT_KEY_PREFIX = "default.";
+    String INTERFACE_KEY = "interface";
+    String GROUP_KEY = "group";
+    String VERSION_KEY = "version";
+
+
     String METHODS_KEY = "methods";
     String METHOD_KEY = "method";
 }

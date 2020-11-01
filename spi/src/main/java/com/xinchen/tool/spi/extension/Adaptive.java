@@ -15,6 +15,7 @@ import java.lang.annotation.Target;
  * 1. 在类上加上@Adaptive注解的类，是最为明确的创建对应类型Adaptive类。所以他优先级最高
  * 2. @SPI注解中的value是默认值，如果通过URL获取不到关于取哪个类作为Adaptive类的话，就使用这个默认值
  * 3. 可以在接口方法上增加@Adaptive注解，注解中的value与URL中的参数的key一致，URL中的key对应的value就是spi中的name,获取相应的实现类
+ * 4. @Adaptive注解的类，即使在/META-INF/app/internal 中配置了别名如: adaptive=...  通过URL(key=adaptive)去寻找其实现类会报错No such extension 。因为在{@link ExtensionLoader cachedClasses}中不会保存Adaptive的类信息
  *
  *
  * @see ExtensionLoader

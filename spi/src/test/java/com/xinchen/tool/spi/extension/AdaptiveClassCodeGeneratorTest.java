@@ -1,6 +1,7 @@
 package com.xinchen.tool.spi.extension;
 
 import com.xinchen.tool.spi.extension.adaptive.AppAdaptiveExt;
+import com.xinchen.tool.spi.extension.ext.ext1.SimpleExt;
 import com.xinchen.tool.spi.utlis.IOUtils;
 import org.junit.Test;
 
@@ -34,4 +35,18 @@ public class AdaptiveClassCodeGeneratorTest {
         }
         System.out.println(value);
     }
+//
+//    @Test
+//    public void generate2() throws IOException {
+//        final AdaptiveClassCodeGenerator generator = new AdaptiveClassCodeGenerator(SimpleExt.class, "impl1");
+//        final String value = generator.generate();
+//        URL url = getClass().getResource("/com/xinchen/tool/spi/extension/SimpleExt$Adaptive");
+//        try (InputStream inputStream = url.openStream()){
+//            String content = IOUtils.read(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+//            // in Windows platform content get from resource contains \r delimiter
+//            content = content.replaceAll("\r","");
+//            assertTrue(content.contains(value.trim()));
+//        }
+//        System.out.println(value);
+//    }
 }
