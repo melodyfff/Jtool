@@ -315,8 +315,9 @@ public class ExtensionLoader<T> {
             // IOC 注入依赖
             Injects.injectExtension(objectFactory,instance,type);
 
-            // wrap对象处理
+            // wrap对象处理 ， 如果cachedWrapperClasses存在，则返回的instance为Wrapped对象
             if (wrap){
+
                 // cachedWrapperClasses在类加载的时候更新
                 if (null != cachedWrapperClasses){
                     List<Class<?>> wrapperClassesList = new ArrayList<>(cachedWrapperClasses);
@@ -327,10 +328,12 @@ public class ExtensionLoader<T> {
 
 
                     for (Class<?> wrapperClass : wrapperClassesList) {
+                        // 检查是否有@Wrapper注解
                         Wrapper wrapper = wrapperClass.getAnnotation(Wrapper.class);
                         if (null == wrapper || (ArrayUtils.contains(wrapper.matches(),name) &&  !ArrayUtils.contains(wrapper.mismatches(), name) )){
                             // 根据wrapperClass反射初始化instance,再通过ioc setter依赖
-                            Injects.injectExtension(objectFactory, wrapperClass.getConstructor(type).newInstance(instance) ,type);
+                            // 这里可能有多个，如果需要选择请使用@Wrapper排除选择
+                            instance = (T) Injects.injectExtension(objectFactory, wrapperClass.getConstructor(type).newInstance(instance) ,type);
                         }
 
                     }

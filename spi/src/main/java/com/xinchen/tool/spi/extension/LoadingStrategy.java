@@ -46,4 +46,10 @@ public interface LoadingStrategy extends Prioritized {
     default boolean overridden() {
         return false;
     }
+
+    default String string(){
+        return this.getClass().getName() +
+                " Scan: " +
+                directory();
+    }
 }
