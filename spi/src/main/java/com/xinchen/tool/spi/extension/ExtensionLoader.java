@@ -176,6 +176,14 @@ public class ExtensionLoader<T> {
         return (T) instance;
     }
 
+    public boolean hasExtension(String name) {
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("Extension name == null");
+        }
+        Class<?> c = this.getExtensionClass(name);
+        return c != null;
+    }
+
     public Set<String> getSupportedExtensions(){
         // LoadClass()后的缓存cachedClasses
         Map<String, Class<?>> extensionClasses = getExtensionClasses();
@@ -321,18 +329,17 @@ public class ExtensionLoader<T> {
                 // cachedWrapperClasses在类加载的时候更新
                 if (null != cachedWrapperClasses){
                     List<Class<?>> wrapperClassesList = new ArrayList<>(cachedWrapperClasses);
-                    // 对Class信息进行排序,这里是从大到小
+                    // 对Class信息进行排序,这里根据是否含有 @Activate#order 进行排序，如果都无@Activate，则顺序可能会随机
                     wrapperClassesList.sort(WrapperComparator.COMPARATOR);
                     // 进行倒叙排序，越小的优先级越高
                     Collections.reverse(wrapperClassesList);
 
-
+                    // 这里可能有多个 (wrap1 -> wrap2 -> instance)，如果需要选择请使用@Wrapper排除选择
                     for (Class<?> wrapperClass : wrapperClassesList) {
                         // 检查是否有@Wrapper注解
                         Wrapper wrapper = wrapperClass.getAnnotation(Wrapper.class);
                         if (null == wrapper || (ArrayUtils.contains(wrapper.matches(),name) &&  !ArrayUtils.contains(wrapper.mismatches(), name) )){
                             // 根据wrapperClass反射初始化instance,再通过ioc setter依赖
-                            // 这里可能有多个，如果需要选择请使用@Wrapper排除选择
                             instance = (T) Injects.injectExtension(objectFactory, wrapperClass.getConstructor(type).newInstance(instance) ,type);
                         }
 

@@ -10,6 +10,9 @@ import com.xinchen.tool.spi.extension.ext.ext6_wrap.impl.Ext5Wrapper1;
 import com.xinchen.tool.spi.extension.ext.ext6_wrap.impl.Ext5Wrapper2;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static com.xinchen.tool.spi.extension.ExtensionLoader.getExtensionLoader;
 import static junit.framework.TestCase.assertNull;
 import static org.hamcrest.CoreMatchers.*;
@@ -84,7 +87,9 @@ class ExtensionLoaderTest {
 
     @Test
     void test_getExtension_WithWrapper(){
-        // no Adaptive
+        // 由于没有指定@Aactive#order 可能返回:
+        // 1. Ext5Wrapper1 -> Ext5Wrapper2 -> instance
+        // 2. Ext5Wrapper2 -> Ext5Wrapper1 -> instance
         WrappedExt impl1 = getExtensionLoader(WrappedExt.class).getExtension("impl1");
         assertThat(impl1, anyOf(instanceOf(Ext5Wrapper1.class), instanceOf(Ext5Wrapper2.class)));
 
@@ -96,12 +101,96 @@ class ExtensionLoaderTest {
         int echoCount1 = Ext5Wrapper1.echoCount.get();
         int echoCount2 = Ext5Wrapper2.echoCount.get();
 
+        // 嵌套包裹，计数器都增加
         assertEquals("Ext5Impl1-echo", impl1.echo(url, "ha"));
         assertEquals("Ext5Impl2-echo", impl2.echo(url, "ha"));
-        assertEquals(echoCount1 + 1, Ext5Wrapper1.echoCount.get());
-        assertEquals(echoCount2 + 1, Ext5Wrapper2.echoCount.get());
+        assertEquals(echoCount1 + 2, Ext5Wrapper1.echoCount.get());
+        assertEquals(echoCount2 + 2, Ext5Wrapper2.echoCount.get());
 
     }
 
+    @Test
+    void test_getExtension_ExceptionNoExtension(){
+        try {
+            getExtensionLoader(SimpleExt.class).getExtension("XXX");
+            fail();
+        } catch (IllegalStateException expected) {
+            assertThat(expected.getMessage(), containsString("No such extension com.xinchen.tool.spi.extension.ext.ext1.SimpleExt by name XXX"));
+        }
+    }
 
+    @Test
+    void test_getExtension_ExceptionNoExtension_WrapperNotEffectiveName() {
+        try {
+            getExtensionLoader(WrappedExt.class).getExtension("XXX");
+            fail();
+        } catch (IllegalStateException expected) {
+            assertThat(expected.getMessage(), containsString("No such extension com.xinchen.tool.spi.extension.ext.ext6_wrap.WrappedExt by name XXX"));
+        }
+    }
+
+    @Test
+    void test_getExtension_ExceptionNullArg() {
+        try {
+            getExtensionLoader(SimpleExt.class).getExtension(null);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertThat(expected.getMessage(), containsString("Extension name == null"));
+        }
+    }
+
+    @Test
+    void test_hasExtension() {
+        assertTrue(getExtensionLoader(SimpleExt.class).hasExtension("impl1"));
+        // 从cachedClasses中获取, ','分隔符不起作用
+        assertFalse(getExtensionLoader(SimpleExt.class).hasExtension("impl1,impl2"));
+        assertFalse(getExtensionLoader(SimpleExt.class).hasExtension("xxx"));
+
+        try {
+            getExtensionLoader(SimpleExt.class).hasExtension(null);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertThat(expected.getMessage(), containsString("Extension name == null"));
+        }
+    }
+
+    @Test
+    void test_hasExtension_wrapperIsNotExt(){
+        assertTrue(getExtensionLoader(WrappedExt.class).hasExtension("impl1"));
+        assertFalse(getExtensionLoader(WrappedExt.class).hasExtension("impl1,impl2"));
+        assertFalse(getExtensionLoader(WrappedExt.class).hasExtension("xxx"));
+
+        // cachedClasses中不会存储Wrap的class , 会存在cachedWrapperClasses中
+        assertFalse(getExtensionLoader(WrappedExt.class).hasExtension("wrapper1"));
+
+        try {
+            getExtensionLoader(WrappedExt.class).hasExtension(null);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertThat(expected.getMessage(), containsString("Extension name == null"));
+        }
+    }
+
+    @Test
+    void test_getSupportedExtensions() {
+        Set<String> exts = getExtensionLoader(SimpleExt.class).getSupportedExtensions();
+
+        Set<String> expected = new HashSet<String>();
+        expected.add("impl1");
+        expected.add("impl2");
+        expected.add("impl3");
+
+        assertEquals(expected, exts);
+    }
+
+    @Test
+    void test_getSupportedExtensions_wrapperIsNotExt() {
+        Set<String> exts = getExtensionLoader(WrappedExt.class).getSupportedExtensions();
+
+        Set<String> expected = new HashSet<String>();
+        expected.add("impl1");
+        expected.add("impl2");
+
+        assertEquals(expected, exts);
+    }
 }
