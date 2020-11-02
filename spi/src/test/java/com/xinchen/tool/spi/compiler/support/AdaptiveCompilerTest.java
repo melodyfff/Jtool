@@ -1,0 +1,35 @@
+package com.xinchen.tool.spi.compiler.support;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Method;
+
+/**
+ * @author xinchen
+ * @version 1.0
+ * @date 02/11/2020 10:49
+ */
+public class AdaptiveCompilerTest extends JavaCodeTest {
+
+    @Test
+    public void testAvailableCompiler() throws Exception {
+        AdaptiveCompiler.setDefaultCompiler("jdk");
+        AdaptiveCompiler compiler = new AdaptiveCompiler();
+        Class<?> clazz = compiler.compile(getSimpleCode(), AdaptiveCompiler.class.getClassLoader());
+        HelloService helloService = (HelloService) clazz.newInstance();
+        Assertions.assertEquals("Hello world!", helloService.sayHello());
+    }
+
+    @Test
+    public void testAvailableCompiler2() throws Exception {
+        AdaptiveCompiler.setDefaultCompiler("javassist");
+        AdaptiveCompiler compiler = new AdaptiveCompiler();
+        Class<?> clazz = compiler.compile(getSimpleCode(), AdaptiveCompiler.class.getClassLoader());
+        Object instance = clazz.newInstance();
+        Method method = instance.getClass().getMethod("sayHello");
+        Assertions.assertEquals("Hello world!", method.invoke(instance));
+    }
+
+
+}

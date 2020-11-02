@@ -52,7 +52,7 @@ public class ClassHelper {
                 for (String pkg : packages) {
                     try {
                         return classForName(pkg + "." + className);
-                    } catch (ClassNotFoundException e2) {
+                    } catch (ClassNotFoundException ignore) {
                     }
                 }
             }
