@@ -1,0 +1,12 @@
+# MultiValueConverter
+string-to-array=com.xinchen.tool.spi.convert.multiple.StringToArrayConverter
+string-to-blocking-deque=com.xinchen.tool.spi.convert.multiple.StringToBlockingDequeConverter
+string-to-blocking-queue=com.xinchen.tool.spi.convert.multiple.StringToBlockingQueueConverter
+string-to-collection=com.xinchen.tool.spi.convert.multiple.StringToCollectionConverter
+string-to-deque=com.xinchen.tool.spi.convert.multiple.StringToDequeConverter
+string-to-list=com.xinchen.tool.spi.convert.multiple.StringToListConverter
+string-to-navigable-set=com.xinchen.tool.spi.convert.multiple.StringToNavigableSetConverter
+string-to-queue=com.xinchen.tool.spi.convert.multiple.StringToQueueConverter
+string-to-set=com.xinchen.tool.spi.convert.multiple.StringToSetConverter
+string-to-sorted-set=com.xinchen.tool.spi.convert.multiple.StringToSortedSetConverter
+string-to-transfer-queue=com.xinchen.tool.spi.convert.multiple.StringToTransferQueueConverter

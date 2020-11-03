@@ -5,11 +5,11 @@ import com.xinchen.tool.spi.extension.support.WrapperComparator;
 import com.xinchen.tool.spi.lang.Prioritized;
 import com.xinchen.tool.spi.logger.Logger;
 import com.xinchen.tool.spi.logger.LoggerFactory;
-import com.xinchen.tool.spi.utlis.ArrayUtils;
-import com.xinchen.tool.spi.utlis.ClassUtils;
-import com.xinchen.tool.spi.utlis.CollectionUtils;
-import com.xinchen.tool.spi.utlis.ConcurrentHashSet;
-import com.xinchen.tool.spi.utlis.StringUtils;
+import com.xinchen.tool.spi.utils.ArrayUtils;
+import com.xinchen.tool.spi.utils.ClassUtils;
+import com.xinchen.tool.spi.utils.CollectionUtils;
+import com.xinchen.tool.spi.utils.ConcurrentHashSet;
+import com.xinchen.tool.spi.utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -230,11 +230,28 @@ public class ExtensionLoader<T> {
     }
 
     /**
+     * Get the extension by specified name if found, or {@link #getDefaultExtension() returns the default one}
+     *
+     * @param name the name of extension
+     * @return non-null
+     */
+    public T getDefaultExtension(String name){
+        return containsExtension(name) ? getExtension(name) : getDefaultExtension();
+    }
+
+    /**
      * Return default extension name, return <code>null</code> if not configured.
      */
     public String getDefaultExtensionName() {
         getExtensionClasses();
         return cachedDefaultName;
+    }
+
+    public String getExtensionName(Class<?> extensionClass){
+        // load class
+        getExtensionClasses();
+
+        return cachedNames.get(extensionClass);
     }
 
     public T getAdaptiveExtension(){
@@ -292,6 +309,92 @@ public class ExtensionLoader<T> {
         return classes;
     }
 
+    /**
+     * Register new extension via API
+     *
+     * @param name  extension name
+     * @param clazz extension class
+     * @throws IllegalStateException when extension with the same name has already been registered.
+     */
+    public void addExtension(String name,Class<?> clazz){
+        // load classes
+        getExtensionClasses();
+
+        // class必须是type接口的子类
+        if (!type.isAssignableFrom(clazz)){
+            throw new IllegalStateException("Input type " + clazz + " doesn't implement the Extension " + type);
+        }
+
+        if (clazz.isInterface()) {
+            throw new IllegalStateException("Input type " + clazz + " can't be interface!");
+        }
+
+
+        // 关于@Adaptive类标记的处理
+        if (clazz.isAnnotationPresent(Adaptive.class)){
+            // 判断当前 type 是否在加载的时候已经注册了适配器类
+            if (cachedAdaptiveClass != null) {
+                throw new IllegalStateException("Adaptive Extension already exists (Extension " + type + ")!");
+            }
+
+            cachedAdaptiveClass = clazz;
+        } else {
+            if (StringUtils.isBlank(name)) {
+                throw new IllegalStateException("Extension name is blank (Extension " + type + ")!");
+            }
+
+            // 当存在同名的拓展类试报错
+            if (cachedClasses.get().containsKey(name)) {
+                throw new IllegalStateException("Extension name " + name + " already exists (Extension " + type + ")!");
+            }
+
+            // 更新Key缓存名和缓存类信息
+            cachedNames.put(clazz, name);
+            cachedClasses.get().put(name, clazz);
+        }
+    }
+
+    /**
+     * Replace the existing extension via API
+     *
+     * not recommended any longer, and use only when test
+     *
+     * @param name  extension name
+     * @param clazz extension class
+     * @throws IllegalStateException when extension to be placed doesn't exist
+     */
+    public void replaceExtension(String name, Class<?> clazz) {
+        // load classes
+        getExtensionClasses();
+
+        if (!type.isAssignableFrom(clazz)) {
+            throw new IllegalStateException("Input type " + clazz + " doesn't implement Extension " + type);
+        }
+        if (clazz.isInterface()) {
+            throw new IllegalStateException("Input type " + clazz + " can't be interface!");
+        }
+
+        if (clazz.isAnnotationPresent(Adaptive.class)) {
+            if (cachedAdaptiveClass == null) {
+                throw new IllegalStateException("Adaptive Extension doesn't exist (Extension " + type + ")!");
+            }
+
+            cachedAdaptiveClass = clazz;
+            cachedAdaptiveInstance.set(null);
+
+        } else {
+            if (StringUtils.isBlank(name)) {
+                throw new IllegalStateException("Extension name is blank (Extension " + type + ")!");
+            }
+            if (!cachedClasses.get().containsKey(name)) {
+                throw new IllegalStateException("Extension name " + name + " doesn't exist (Extension " + type + ")!");
+            }
+
+            cachedNames.put(clazz, name);
+            cachedClasses.get().put(name, clazz);
+            cachedInstances.remove(name);
+        }
+    }
 
 
     //------------------------------------------------------------
@@ -413,7 +516,7 @@ public class ExtensionLoader<T> {
         final Set<Map.Entry<String, IllegalStateException>> entries = exceptions.entrySet();
         // exceptions ,存储加载拓展类时候发生的错误信息
         for (Map.Entry<String, IllegalStateException> entry : entries) {
-            if (entry.getKey().equalsIgnoreCase(name)){
+            if (entry.getKey().toLowerCase().contains(name.toLowerCase())){
                 return entry.getValue();
             }
         }

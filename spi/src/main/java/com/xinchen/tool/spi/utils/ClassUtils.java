@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.xinchen.tool.spi.utlis;
+package com.xinchen.tool.spi.utils;
 
 
 import com.xinchen.tool.spi.function.Streams;
@@ -34,7 +34,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import static com.xinchen.tool.spi.utlis.ArrayUtils.isNotEmpty;
+import static com.xinchen.tool.spi.utils.ArrayUtils.isNotEmpty;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 

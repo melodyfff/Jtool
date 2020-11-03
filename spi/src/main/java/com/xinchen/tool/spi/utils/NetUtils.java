@@ -1,4 +1,4 @@
-package com.xinchen.tool.spi.utlis;
+package com.xinchen.tool.spi.utils;
 
 import com.xinchen.tool.spi.constants.CommonConstants;
 

@@ -1,7 +1,7 @@
 package com.xinchen.tool.spi.compiler.support;
 
 
-import com.xinchen.tool.spi.utlis.ClassUtils;
+import com.xinchen.tool.spi.utils.ClassUtils;
 import javassist.CtClass;
 
 import java.util.Arrays;

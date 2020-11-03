@@ -3,7 +3,7 @@ package com.xinchen.tool.spi.extension;
 import com.xinchen.tool.spi.URL;
 import com.xinchen.tool.spi.logger.Logger;
 import com.xinchen.tool.spi.logger.LoggerFactory;
-import com.xinchen.tool.spi.utlis.StringUtils;
+import com.xinchen.tool.spi.utils.StringUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

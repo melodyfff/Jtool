@@ -1,0 +1,11 @@
+# Converter
+string-to-boolean=com.xinchen.tool.spi.convert.StringToBooleanConverter
+string-to-character=com.xinchen.tool.spi.convert.StringToCharacterConverter
+string-to-char-array=com.xinchen.tool.spi.convert.StringToCharArrayConverter
+string-to-double=com.xinchen.tool.spi.convert.StringToDoubleConverter
+string-to-float=com.xinchen.tool.spi.convert.StringToFloatConverter
+string-to-integer=com.xinchen.tool.spi.convert.StringToIntegerConverter
+string-to-long=com.xinchen.tool.spi.convert.StringToLongConverter
+string-to-optional=com.xinchen.tool.spi.convert.StringToOptionalConverter
+string-to-short=com.xinchen.tool.spi.convert.StringToShortConverter
+string-to-string=com.xinchen.tool.spi.convert.StringToStringConverter

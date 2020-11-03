@@ -1,8 +1,7 @@
 package com.xinchen.tool.spi.extension;
 
 import com.xinchen.tool.spi.extension.adaptive.AppAdaptiveExt;
-import com.xinchen.tool.spi.extension.ext.ext1.SimpleExt;
-import com.xinchen.tool.spi.utlis.IOUtils;
+import com.xinchen.tool.spi.utils.IOUtils;
 import org.junit.Test;
 
 import java.io.IOException;

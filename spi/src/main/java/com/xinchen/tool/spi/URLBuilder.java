@@ -1,8 +1,8 @@
 package com.xinchen.tool.spi;
 
 
-import com.xinchen.tool.spi.utlis.CollectionUtils;
-import com.xinchen.tool.spi.utlis.StringUtils;
+import com.xinchen.tool.spi.utils.CollectionUtils;
+import com.xinchen.tool.spi.utils.StringUtils;
 
 import java.util.Collection;
 import java.util.HashMap;

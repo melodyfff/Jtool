@@ -1,7 +1,7 @@
 package com.xinchen.tool.spi.compiler.support;
 
 import com.xinchen.tool.spi.compiler.Compiler;
-import com.xinchen.tool.spi.utlis.ClassUtils;
+import com.xinchen.tool.spi.utils.ClassUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -1,9 +1,9 @@
 package com.xinchen.tool.spi;
 
-import com.xinchen.tool.spi.utlis.ArrayUtils;
-import com.xinchen.tool.spi.utlis.CollectionUtils;
-import com.xinchen.tool.spi.utlis.NetUtils;
-import com.xinchen.tool.spi.utlis.StringUtils;
+import com.xinchen.tool.spi.utils.ArrayUtils;
+import com.xinchen.tool.spi.utils.CollectionUtils;
+import com.xinchen.tool.spi.utils.NetUtils;
+import com.xinchen.tool.spi.utils.StringUtils;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;

@@ -1,6 +1,6 @@
 package com.xinchen.tool.spi.compiler.support;
 
-import com.xinchen.tool.spi.utlis.StringUtils;
+import com.xinchen.tool.spi.utils.StringUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

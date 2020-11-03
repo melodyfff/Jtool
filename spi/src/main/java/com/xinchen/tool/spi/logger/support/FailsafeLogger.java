@@ -2,7 +2,7 @@ package com.xinchen.tool.spi.logger.support;
 
 import com.xinchen.tool.spi.Version;
 import com.xinchen.tool.spi.logger.Logger;
-import com.xinchen.tool.spi.utlis.NetUtils;
+import com.xinchen.tool.spi.utils.NetUtils;
 
 /**
  * @author Xin Chen (xinchenmelody@gmail.com)

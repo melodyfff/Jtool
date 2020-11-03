@@ -1,4 +1,4 @@
-package com.xinchen.tool.spi.utlis;
+package com.xinchen.tool.spi.utils;
 
 import com.xinchen.tool.spi.io.UnsafeStringWriter;
 
@@ -128,6 +128,20 @@ public final class StringUtils {
         }
         return splitToList0(str, ch);
     }
+
+
+    /**
+     * Gets a CharSequence length or {@code 0} if the CharSequence is
+     * {@code null}.
+     *
+     * @param cs a CharSequence or {@code null}
+     * @return CharSequence length or {@code 0} if the CharSequence is
+     * {@code null}.
+     */
+    public static int length(final CharSequence cs) {
+        return cs == null ? 0 : cs.length();
+    }
+
 
     /**
      * split.

@@ -17,7 +17,7 @@
 package com.xinchen.tool.spi.compiler.support;
 
 
-import com.xinchen.tool.spi.utlis.ClassUtils;
+import com.xinchen.tool.spi.utils.ClassUtils;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.FileObject;
