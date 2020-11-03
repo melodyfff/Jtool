@@ -1,0 +1,2 @@
+string-to-double=com.xinchen.tool.spi.extension.convert.String2DoubleConverter
+string-to-integer=com.xinchen.tool.spi.extension.convert.String2IntegerConverter
