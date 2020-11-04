@@ -1,5 +1,6 @@
 package com.xinchen.tool.spi;
 
+import com.xinchen.tool.spi.constants.CommonConstants;
 import com.xinchen.tool.spi.utils.ArrayUtils;
 import com.xinchen.tool.spi.utils.CollectionUtils;
 import com.xinchen.tool.spi.utils.NetUtils;
@@ -10,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -54,6 +56,9 @@ public class URL implements Serializable {
 
 
     private volatile transient String ip;
+
+    /** full url */
+    private volatile transient String full;
 
     private volatile transient String toString;
 
@@ -393,6 +398,12 @@ public class URL implements Serializable {
         return StringUtils.isEmpty(value) ? defaultValue : value;
     }
 
+    public boolean hasParameter(String key) {
+        String value = getParameter(key);
+        return value != null && value.length() > 0;
+    }
+
+
     public URL addParameter(String key, String value) {
         if (StringUtils.isEmpty(key)
                 || StringUtils.isEmpty(value)) {
@@ -482,6 +493,13 @@ public class URL implements Serializable {
         return new URL(getProtocol(), username, password, host, port, path, map);
     }
 
+    public URL removeParameters(Collection<String> keys) {
+        if (CollectionUtils.isEmpty(keys)) {
+            return this;
+        }
+        return removeParameters(keys.toArray(new String[0]));
+    }
+
     @Override
     public String toString() {
         if (toString != null) {
@@ -489,6 +507,13 @@ public class URL implements Serializable {
         }
         // no show username and password
         return toString = buildString(false, true);
+    }
+
+    public String toFullString() {
+        if (full != null) {
+            return full;
+        }
+        return full = buildString(true, true);
     }
 
     //----------------------------------------------------------
@@ -613,5 +638,71 @@ public class URL implements Serializable {
 
     private static String getAddress(String host, int port) {
         return port <= 0 ? host : host + ':' + port;
+    }
+
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((host == null) ? 0 : host.hashCode());
+        result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+        result = prime * result + ((password == null) ? 0 : password.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + port;
+        result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
+        result = prime * result + ((username == null) ? 0 : username.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        URL other = (URL) obj;
+        if (!StringUtils.isEquals(host, other.host)) {
+            return false;
+        }
+        if (parameters == null) {
+            if (other.parameters != null) {
+                return false;
+            }
+        } else if (!parameters.keySet().equals(other.parameters.keySet())) {
+            return false;
+        } else {
+            for (String key : parameters.keySet()) {
+                if (key.equals(CommonConstants.TIMESTAMP_KEY)) {
+                    continue;
+                }
+                if (!parameters.get(key).equals(other.parameters.get(key))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        if (!StringUtils.isEquals(password, other.password)) {
+            return false;
+        }
+        if (!StringUtils.isEquals(path, other.path)) {
+            return false;
+        }
+        if (port != other.port) {
+            return false;
+        }
+        if (!StringUtils.isEquals(protocol, other.protocol)) {
+            return false;
+        }
+        if (!StringUtils.isEquals(username, other.username)) {
+            return false;
+        }
+        return true;
     }
 }

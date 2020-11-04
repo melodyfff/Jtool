@@ -20,7 +20,7 @@ public interface CommonConstants {
     String INTERFACE_KEY = "interface";
     String GROUP_KEY = "group";
     String VERSION_KEY = "version";
-
+    String TIMESTAMP_KEY = "timestamp";
 
     String METHODS_KEY = "methods";
     String METHOD_KEY = "method";
