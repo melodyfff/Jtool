@@ -1,10 +1,19 @@
 package com.xinchen.tool.spi.extension;
 
 import com.xinchen.tool.spi.URL;
+import com.xinchen.tool.spi.constants.CommonConstants;
 import com.xinchen.tool.spi.convert.Converter;
 import com.xinchen.tool.spi.convert.StringToBooleanConverter;
 import com.xinchen.tool.spi.convert.StringToDoubleConverter;
 import com.xinchen.tool.spi.convert.StringToIntegerConverter;
+import com.xinchen.tool.spi.extension.activate.ActivateExt1;
+import com.xinchen.tool.spi.extension.activate.impl.ActivateExt1Impl1;
+import com.xinchen.tool.spi.extension.activate.impl.GroupActivateExtImpl;
+import com.xinchen.tool.spi.extension.activate.impl.OldActivateExt1Impl2;
+import com.xinchen.tool.spi.extension.activate.impl.OldActivateExt1Impl3;
+import com.xinchen.tool.spi.extension.activate.impl.OrderActivateExtImpl1;
+import com.xinchen.tool.spi.extension.activate.impl.OrderActivateExtImpl2;
+import com.xinchen.tool.spi.extension.activate.impl.ValueActivateExtImpl;
 import com.xinchen.tool.spi.extension.convert.String2BooleanConverter;
 import com.xinchen.tool.spi.extension.convert.String2DoubleConverter;
 import com.xinchen.tool.spi.extension.convert.String2IntegerConverter;
@@ -37,6 +46,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.xinchen.tool.spi.extension.ExtensionLoader.getExtensionLoader;
@@ -374,12 +384,68 @@ class ExtensionLoaderTest {
 
     @Test
     void testLoadActivateExtension(){
+        // ActivateExt1 的配置分散在 META-INF/app/internal 和 META-INF/services中
 
+        // ActivateExt1Impl1    - @Activate(group = {"default_group"})
+        // GroupActivateExtImpl - @Activate(group = {"group1", "group2"})
+        // OldActivateExt1Impl2 - @Activate(group = "old_group")
+        // OldActivateExt1Impl3 - @Activate(group = "old_group")
+        // ValueActivateExtImpl - @Activate(value = {"value"}, group = {"value"})
+        // OrderActivateExtImpl1- @Activate(order = 1, group = {"order"})
+        // OrderActivateExtImpl2- @Activate(order = 2, group = {"order"})
+
+        // test default
+        URL url = URL.valueOf("test://localhost/test");
+        List<ActivateExt1> list = getExtensionLoader(ActivateExt1.class).getActivateExtension(url, new String[]{}, "default_group");
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertSame(list.get(0).getClass(), ActivateExt1Impl1.class);
+
+
+        // test group
+        url = url.addParameter("group", "group1");
+        list = getExtensionLoader(ActivateExt1.class).getActivateExtension(url, new String[]{}, "group1");
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertSame(list.get(0).getClass(), GroupActivateExtImpl.class);
+
+        // test old @Activate group 返回同一个group下的可用拓展
+        url = url.addParameter("group", "old_group");
+        list = getExtensionLoader(ActivateExt1.class).getActivateExtension(url, new String[]{}, "old_group");
+        Assertions.assertEquals(2, list.size());
+        Assertions.assertTrue(list.get(0).getClass() == OldActivateExt1Impl2.class
+                || list.get(0).getClass() == OldActivateExt1Impl3.class);
+
+        // test value
+        url = url.removeParameter("group");
+        url = url.addParameter("group", "value");
+        url = url.addParameter("value", "value");
+        list = getExtensionLoader(ActivateExt1.class).getActivateExtension(url, new String[]{}, "value");
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertSame(list.get(0).getClass(), ValueActivateExtImpl.class);
+
+
+        // test order
+        url = URL.valueOf("test://localhost/test");
+        url = url.addParameter(CommonConstants.GROUP_KEY, "order");
+        list = getExtensionLoader(ActivateExt1.class).getActivateExtension(url, new String[]{}, "order");
+        Assertions.assertEquals(2, list.size());
+        Assertions.assertSame(list.get(0).getClass(), OrderActivateExtImpl1.class);
+        Assertions.assertSame(list.get(1).getClass(), OrderActivateExtImpl2.class);
     }
 
     @Test
     void testLoadDefaultActivateExtension(){
+        // test default
+        URL url = URL.valueOf("test://localhost/test?ext=order1,default");
+        List<ActivateExt1> list = getExtensionLoader(ActivateExt1.class).getActivateExtension(url, "ext", "default_group");
+        Assertions.assertEquals(2, list.size());
+        Assertions.assertSame(list.get(0).getClass(), OrderActivateExtImpl1.class);
+        Assertions.assertSame(list.get(1).getClass(), ActivateExt1Impl1.class);
 
+        url = URL.valueOf("test://localhost/test?ext123=default,order1");
+        list = getExtensionLoader(ActivateExt1.class).getActivateExtension(url, "ext123", "default_group");
+        Assertions.assertEquals(2, list.size());
+        Assertions.assertSame(list.get(0).getClass(), ActivateExt1Impl1.class);
+        Assertions.assertSame(list.get(1).getClass(), OrderActivateExtImpl1.class);
     }
 
     @Test

@@ -1,5 +1,7 @@
 package com.xinchen.tool.spi.extension;
 
+import com.xinchen.tool.spi.URL;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

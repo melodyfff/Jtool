@@ -461,6 +461,27 @@ public class URL implements Serializable {
         return new URL(getProtocol(), username, password, host, port, path, map);
     }
 
+    public URL removeParameter(String key) {
+        if (StringUtils.isEmpty(key)) {
+            return this;
+        }
+        return removeParameters(key);
+    }
+
+    public URL removeParameters(String... keys) {
+        if (keys == null || keys.length == 0) {
+            return this;
+        }
+        Map<String, String> map = new HashMap<>(getParameters());
+        for (String key : keys) {
+            map.remove(key);
+        }
+        if (map.size() == getParameters().size()) {
+            return this;
+        }
+        return new URL(getProtocol(), username, password, host, port, path, map);
+    }
+
     @Override
     public String toString() {
         if (toString != null) {

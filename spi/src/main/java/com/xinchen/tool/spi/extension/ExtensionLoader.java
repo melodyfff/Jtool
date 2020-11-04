@@ -1,6 +1,9 @@
 package com.xinchen.tool.spi.extension;
 
+import com.xinchen.tool.spi.URL;
+import com.xinchen.tool.spi.constants.CommonConstants;
 import com.xinchen.tool.spi.context.Lifecycle;
+import com.xinchen.tool.spi.extension.support.ActivateComparator;
 import com.xinchen.tool.spi.extension.support.WrapperComparator;
 import com.xinchen.tool.spi.lang.Prioritized;
 import com.xinchen.tool.spi.logger.Logger;
@@ -9,6 +12,7 @@ import com.xinchen.tool.spi.utils.ArrayUtils;
 import com.xinchen.tool.spi.utils.ClassUtils;
 import com.xinchen.tool.spi.utils.CollectionUtils;
 import com.xinchen.tool.spi.utils.ConcurrentHashSet;
+import com.xinchen.tool.spi.utils.ConfigUtils;
 import com.xinchen.tool.spi.utils.StringUtils;
 
 import java.io.BufferedReader;
@@ -58,12 +62,6 @@ public class ExtensionLoader<T> {
     /** 加载服务策略 - 指定加载的目录以及优先级
         Load all {@link Prioritized prioritized} {@link LoadingStrategy Loading Strategies} via {@link ServiceLoader} */
     private static volatile LoadingStrategy[] strategies = loadLoadingStrategies();
-    private static LoadingStrategy[] loadLoadingStrategies() {
-        // JDK的SPI : 从META-INF/services/中目录中加载拓展SPI的加载目录
-        return StreamSupport.stream(ServiceLoader.load(LoadingStrategy.class).spliterator(), false)
-                .sorted()
-                .toArray(LoadingStrategy[]::new);
-    }
 
     //------------------------------------------------------------
     // FIELD
@@ -114,6 +112,20 @@ public class ExtensionLoader<T> {
     // Static Method
     //------------------------------------------------------------
 
+    /** init LoadingStrategy */
+    private static LoadingStrategy[] loadLoadingStrategies() {
+        // JDK的SPI : 从META-INF/services/中目录中加载拓展SPI的加载目录
+        return StreamSupport.stream(ServiceLoader.load(LoadingStrategy.class).spliterator(), false)
+                .sorted()
+                .toArray(LoadingStrategy[]::new);
+    }
+
+    public static void setLoadingStrategies(LoadingStrategy... strategies) {
+        if (ArrayUtils.isNotEmpty(strategies)) {
+            ExtensionLoader.strategies = strategies;
+        }
+    }
+
     /** 获取加载策略 */
     public static List<LoadingStrategy> getLoadingStrategies() {
         return Arrays.asList(strategies);
@@ -136,6 +148,35 @@ public class ExtensionLoader<T> {
         // 如果EXTENSION_LOADERS中没有该type,则以该type为key,新建一个ExtensionLoader(Class)为value，存入该map
         // 保证每个type对应的ExtensionLoader只被加载一次
         return (ExtensionLoader<T>) EXTENSION_LOADERS.computeIfAbsent(type, ExtensionLoader::new);
+    }
+
+    /** 重置 清空全局缓存 EXTENSION_INSTANCES和EXTENSION_LOADERS ，已经加载类缓存cachedClasses，
+     *  For testing purposes only */
+    public static void resetExtensionLoader(Class type) {
+        ExtensionLoader loader = EXTENSION_LOADERS.get(type);
+        if (loader != null) {
+            // Remove all instances associated with this loader as well
+            Map<String, Class<?>> classes = loader.getExtensionClasses();
+            for (Map.Entry<String, Class<?>> entry : classes.entrySet()) {
+                EXTENSION_INSTANCES.remove(entry.getValue());
+            }
+            classes.clear();
+            EXTENSION_LOADERS.remove(type);
+        }
+    }
+
+    /** 生命周期管理 context中的LifeCycle */
+    public static void destroyAll() {
+        EXTENSION_INSTANCES.forEach((_type, instance) -> {
+            if (instance instanceof Lifecycle) {
+                Lifecycle lifecycle = (Lifecycle) instance;
+                try {
+                    lifecycle.destroy();
+                } catch (Exception e) {
+                    log.error("Error destroying extension " + lifecycle, e);
+                }
+            }
+        });
     }
 
     private static ClassLoader findClassLoader(){
@@ -174,6 +215,210 @@ public class ExtensionLoader<T> {
         }
 
         return (T) instance;
+    }
+
+    public String getExtensionName(T extensionInstance) {
+        return getExtensionName(extensionInstance.getClass());
+    }
+
+    public String getExtensionName(Class<?> extensionClass){
+        // load class
+        getExtensionClasses();
+        return cachedNames.get(extensionClass);
+    }
+
+
+    /**
+     * This is equivalent to {@code getActivateExtension(url, key, null)}
+     *
+     * @param url url
+     * @param key url parameter key which used to get extension point names
+     * @return extension list which are activated.
+     * @see #getActivateExtension(com.xinchen.tool.spi.URL, String, String)
+     */
+    public List<T> getActivateExtension(URL url, String key) {
+        return getActivateExtension(url, key, null);
+    }
+
+    /**
+     * This is equivalent to {@code getActivateExtension(url, values, null)}
+     *
+     * @param url    url
+     * @param values extension point names
+     * @return extension list which are activated
+     * @see #getActivateExtension(com.xinchen.tool.spi.URL, String[], String)
+     */
+    public List<T> getActivateExtension(URL url, String[] values) {
+        return getActivateExtension(url, values, null);
+    }
+
+    /**
+     * This is equivalent to {@code getActivateExtension(url, url.getParameter(key).split(","), null)}
+     *
+     * @param url   url
+     * @param key   url parameter key which used to get extension point names
+     * @param group group
+     * @return extension list which are activated.
+     * @see #getActivateExtension(com.xinchen.tool.spi.URL, String[], String)
+     */
+    public List<T> getActivateExtension(URL url, String key, String group) {
+        String value = url.getParameter(key);
+        // key1,key2...
+        return getActivateExtension(
+                url,
+                StringUtils.isEmpty(value) ? null : CommonConstants.COMMA_SPLIT_PATTERN.split(value),
+                group
+        );
+    }
+
+
+    /**
+     * Get activate extensions.  已经初始化完毕
+     *
+     * @param url    url
+     * @param values extension point names
+     * @param group  group
+     * @return extension list which are activated
+     * @see com.xinchen.tool.spi.extension.Activate
+     */
+    public List<T> getActivateExtension(URL url, String[] values, String group) {
+        ArrayList<T> activateExtensions = new ArrayList<>();
+
+        // url中需要匹配的 parameters 的key
+        List<String> names = values == null ? new ArrayList<>(0) : Arrays.asList(values);
+        // 判断是否包含 '-default'
+        // 这里实际上已经在加载匹配到group下的cachedActivates中的值，group为null其实就是在加载所有通过isActive()校验的
+        if (!names.contains("-default")){
+            // load class
+            getExtensionClasses();
+
+            // cacheActivateClass中的类必有 @Activate注解
+            for (Map.Entry<String, Object> entry : cachedActivates.entrySet()) {
+                String name = entry.getKey();
+                Object activate = entry.getValue();
+
+                String[] activateGroup, activateValue;
+
+                activateGroup = ((Activate) activate).group();
+                activateValue = ((Activate) activate).value();
+
+                if (isMatchGroup(group,activateGroup)
+                        && !names.contains(name)
+                        && !names.contains("-"+name)
+                        && isActive(activateValue,url)){
+
+                    // add
+                    activateExtensions.add(getExtension(name));
+                }
+            }
+
+            // 排序
+            activateExtensions.sort(ActivateComparator.COMPARATOR);
+        }
+
+        List<T> loadedExtensions = new ArrayList<>();
+
+        // values - 拓展的实例名，这里其实是在加载并初始化，保证该拓展存在
+        //
+        names.forEach(name ->{
+            if (!name.startsWith("-") && !names.contains("-"+name)){
+                if ("default".equals(name)){
+                    if (!loadedExtensions.isEmpty()) {
+                        // 确保顺序
+                        activateExtensions.addAll(0, loadedExtensions);
+                        loadedExtensions.clear();
+                    }
+                } else {
+                    loadedExtensions.add(getExtension(name));
+                }
+            }
+        });
+
+        if (!loadedExtensions.isEmpty()) {
+            activateExtensions.addAll(loadedExtensions);
+        }
+
+        return activateExtensions;
+    }
+
+    private boolean isMatchGroup(String group, String[] groups) {
+        if (StringUtils.isEmpty(group)) {
+            return true;
+        }
+        if (groups != null && groups.length > 0) {
+            for (String g : groups) {
+                if (group.equals(g)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isActive(String[] keys, URL url) {
+        // 这里的key对应((Activate) activate).value()，为空则表示无挑选
+        if (keys.length == 0) {
+            return true;
+        }
+        for (String key : keys) {
+            // @Active(value="key1:value1, key2:value2")
+            String keyValue = null;
+            if (key.contains(":")) {
+                String[] arr = key.split(":");
+                key = arr[0];
+                keyValue = arr[1];
+            }
+
+            for (Map.Entry<String, String> entry : url.getParameters().entrySet()) {
+                String k = entry.getKey();
+                String v = entry.getValue();
+
+                // 这里比对的是Activate#value() 与URL中的Parameters的key 值是否对应得上
+                // 当Activate#value()的值是以@Active(value="key1:value1, key2:value2")的形式，则进一步去对比和URL参数中的值是否相同，否则则只关注key是否相同
+                if ((k.equals(key) || k.endsWith("." + key))
+                        && ((keyValue != null && keyValue.equals(v)) || (keyValue == null && ConfigUtils.isNotEmpty(v)))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get extension's instance. Return <code>null</code> if extension is not found or is not initialized. Pls. note
+     * that this method will not trigger extension load.
+     * <p>
+     * In order to trigger extension load, call {@link #getExtension(String)} instead.
+     *
+     * @see #getExtension(String)
+     */
+    public T getLoadedExtension(String name) {
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("Extension name == null");
+        }
+        Holder<Object> holder = getOrCreateHolder(name);
+        return (T) holder.get();
+    }
+
+    /**
+     * Return the list of extensions which are already loaded.
+     * <p>
+     * Usually {@link #getSupportedExtensions()} should be called in order to get all extensions.
+     *
+     * @see #getSupportedExtensions()
+     */
+    public Set<String> getLoadedExtensions() {
+        return Collections.unmodifiableSet(new TreeSet<>(cachedInstances.keySet()));
+    }
+
+    public List<T> getLoadedExtensionInstances() {
+        List<T> instances = new ArrayList<>();
+        cachedInstances.values().forEach(holder -> instances.add((T) holder.get()));
+        return instances;
+    }
+
+    public Object getLoadedAdaptiveExtensionInstances() {
+        return cachedAdaptiveInstance.get();
     }
 
     public boolean hasExtension(String name) {
@@ -247,12 +492,6 @@ public class ExtensionLoader<T> {
         return cachedDefaultName;
     }
 
-    public String getExtensionName(Class<?> extensionClass){
-        // load class
-        getExtensionClasses();
-
-        return cachedNames.get(extensionClass);
-    }
 
     public T getAdaptiveExtension(){
         Object instance = cachedAdaptiveInstance.get();
@@ -855,6 +1094,12 @@ public class ExtensionLoader<T> {
         } catch (NoSuchMethodException e) {
             return false;
         }
+    }
+
+
+    @Override
+    public String toString() {
+        return this.getClass().getName() + "[" + type.getName() + "]";
     }
 
     //------------------------------------------------------------

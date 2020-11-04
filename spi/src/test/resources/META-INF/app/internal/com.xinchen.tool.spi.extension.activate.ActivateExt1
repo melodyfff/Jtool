@@ -1,0 +1,6 @@
+group=com.xinchen.tool.spi.extension.activate.impl.GroupActivateExtImpl
+value=com.xinchen.tool.spi.extension.activate.impl.ValueActivateExtImpl
+order1=com.xinchen.tool.spi.extension.activate.impl.OrderActivateExtImpl1
+order2=com.xinchen.tool.spi.extension.activate.impl.OrderActivateExtImpl2
+old1=com.xinchen.tool.spi.extension.activate.impl.OldActivateExt1Impl2
+old2=com.xinchen.tool.spi.extension.activate.impl.OldActivateExt1Impl3
