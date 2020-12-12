@@ -11,11 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
+ * 设置OkHttp的DNS域名解析: https://zybuluo.com/act262/note/798277
+ *
  * @author Xin Chen (xinchenmelody@gmail.com)
  * @version 1.0
  * @date Created In 2020/12/12 17:44
  */
-public class DnsFacory {
+public class DnsFactory {
     public static Dns create(){
         return new DnsResolve();
     }

@@ -15,7 +15,7 @@ public class OkHttpClientFactory {
         return new OkHttpClient.Builder()
                 // 默认值 10s
                 .connectTimeout(10, TimeUnit.SECONDS)
-                .dns(DnsFacory.create())
+                .dns(DnsFactory.create())
                 .addInterceptor((chain -> {
                     Request request = chain.request();
                     return chain.proceed(request);
