@@ -1,6 +1,7 @@
 package com.xinchen.tool.fegin;
 
 import com.netflix.hystrix.HystrixCommand;
+import com.netflix.hystrix.exception.HystrixRuntimeException;
 import feign.RequestLine;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 
 
 /**
@@ -31,8 +33,14 @@ public class ApiTest {
 
         assertThat(testApi.call()).isEqualTo("hello");
         assertThat(testApi.hyCall().execute()).isEqualTo("world");
+    }
 
+    @Test
+    public void testOkHttp(){
+        final TestApi testApi = Api.builder(TestApi.class, "http://www.baidu.com").buildOkHttp();
 
+        assertThrows(HystrixRuntimeException.class, testApi::call);
+        assertThrows(HystrixRuntimeException.class, () -> testApi.hyCall().execute());
     }
 
     interface TestApi{

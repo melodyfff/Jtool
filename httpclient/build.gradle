@@ -22,6 +22,7 @@ dependencies {
     testCompile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 
     // okhttp3
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.8.0'
     testCompile group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.8.0'
 
     // spring context

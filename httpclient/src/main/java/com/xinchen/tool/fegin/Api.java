@@ -5,6 +5,8 @@ import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
 import com.xinchen.tool.fegin.hystrix.HystrixFeign;
+import com.xinchen.tool.fegin.okhttp.OkHttpClient;
+import com.xinchen.tool.okhttp.OkHttpClientFactory;
 import feign.Feign;
 import feign.Request;
 import feign.Retryer;
@@ -39,7 +41,6 @@ class Api {
     }
 
     public static class Builder<T> {
-
         private static final String JSON_CONTENT_TYPE = "application/json;charset=utf-8";
         private final Class<T> apiClazz;
         private final String host;
@@ -53,9 +54,20 @@ class Api {
         }
 
         public T build() {
+            return builderMaker()
+                    .target(apiClazz, host);
+        }
+
+        public T buildOkHttp() {
+            return builderMaker()
+                    .client(new OkHttpClient(OkHttpClientFactory.createDnsResolve()))
+                    .target(apiClazz, host);
+        }
+
+        private HystrixFeign.Builder builderMaker() {
             return HystrixFeign.builder()
                     // 请求拦截器，添加header
-                    .requestInterceptor((requestTemplate)->{
+                    .requestInterceptor((requestTemplate) -> {
                         requestTemplate.header(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE);
                     })
                     .encoder(new GsonEncoder())
@@ -73,8 +85,7 @@ class Api {
                                     )
                             ))
                     // 关闭重试
-                    .retryer(Retryer.NEVER_RETRY)
-                    .target(apiClazz, host);
+                    .retryer(Retryer.NEVER_RETRY);
         }
     }
 }
