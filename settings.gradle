@@ -22,4 +22,5 @@ include 'redis-client'
 include 'hystrix'
 include 'rxjava'
 include 'spi'
+include 'jmh'
 
