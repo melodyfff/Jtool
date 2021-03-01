@@ -13,6 +13,10 @@ dependencies {
     // Objenesis is a library dedicated to bypass the constructor when creating an object.
     compile group: 'org.objenesis', name: 'objenesis', version: '3.1'
 
+    // protostuff: A java serialization library with built-in support for forward-backward compatibility (schema evolution) and validation.
+    compile group: 'io.protostuff', name: 'protostuff-core', version: '1.7.2'
+    compile group: 'io.protostuff', name: 'protostuff-runtime', version: '1.7.2'
+
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.1'
 }
