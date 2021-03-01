@@ -23,4 +23,5 @@ include 'hystrix'
 include 'rxjava'
 include 'spi'
 include 'jmh'
+include 'serialization'
 
