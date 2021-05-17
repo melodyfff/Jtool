@@ -17,6 +17,9 @@ dependencies {
     compile group: 'io.protostuff', name: 'protostuff-core', version: '1.7.2'
     compile group: 'io.protostuff', name: 'protostuff-runtime', version: '1.7.2'
 
+    // hessian: a simple binary protocol for connecting web services.
+    implementation group: 'com.caucho', name: 'hessian', version: '4.0.65'
+
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.1'
 }
