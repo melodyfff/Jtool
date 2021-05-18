@@ -11,6 +11,7 @@ dependencies {
 
     implementation group: 'org.apache.camel', name: 'camel-stream', version: '3.9.0'
 
+    implementation group: 'org.apache.camel', name: 'camel-jetty', version: '3.9.0'
     implementation group: 'org.apache.camel', name: 'camel-http', version: '3.9.0'
     implementation group: 'org.apache.camel', name: 'camel-mock', version: '3.9.0'
 
