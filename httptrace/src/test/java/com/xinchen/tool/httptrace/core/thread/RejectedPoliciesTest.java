@@ -14,9 +14,9 @@ import org.junit.jupiter.api.Test;
  * @date 2021-07-13 16:59
  */
 class RejectedPoliciesTest {
-  private final int DEFAULT_CORE_POOL_SIZE = 1;
-  private final int DEFAULT_KEEP_ALIVE_TIME = 10;
-  private final int MAX_QUEUE_SIZE = 1;
+  private static final int DEFAULT_CORE_POOL_SIZE = 1;
+  private static final int DEFAULT_KEEP_ALIVE_TIME = 10;
+  private static final int MAX_QUEUE_SIZE = 1;
   /**
    * Test runs oldest task policy.
    *
