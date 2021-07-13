@@ -1,4 +1,4 @@
-package com.xinchen.tool.httptrace.trace;
+package com.xinchen.tool.httptrace.spring.actuator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

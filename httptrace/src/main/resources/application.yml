@@ -1,35 +1,3 @@
-server:
-  port: 8080
-
-
-management:
-  trace:
-    http:
-      # Displays HTTP trace information (by default, the last 100 HTTP request-response exchanges). Requires an HttpTraceRepository bean.
-      # Disable management.trace.http by default #15039
-      enabled: true
-
-  endpoint:
-    info:
-      enabled: true
-#    env:
-#      enabled: true
-#    health:
-#      enabled: false
-#    httptrace:
-#      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: 'httptrace'
-        exclude:
-    enabled-by-default: true # 开启端点暴露
-
-
-
-# 自定义info端点返回消息, curl http://localhost:8080/actuator/info
-#  {
-#    "Hello": "World"
-#  }
-info:
-  Hello: World
+spring:
+  profiles:
+    active: actuator

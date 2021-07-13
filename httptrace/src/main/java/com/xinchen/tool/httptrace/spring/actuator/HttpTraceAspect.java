@@ -1,4 +1,4 @@
-package com.xinchen.tool.httptrace.trace;
+package com.xinchen.tool.httptrace.spring.actuator;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class HttpTraceAspect {
 
-    @Pointcut("@annotation(com.xinchen.tool.httptrace.trace.HttpTrace)")
+    @Pointcut("@annotation(com.xinchen.tool.httptrace.spring.actuator.HttpTrace)")
     public void httpTraceCut() {
 
     }

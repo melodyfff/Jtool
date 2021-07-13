@@ -1,7 +1,8 @@
-package com.xinchen.tool.httptrace.trace;
+package com.xinchen.tool.httptrace.spring.actuator;
 
 import com.google.gson.Gson;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,9 @@ import java.util.stream.Collectors;
 public class HelloApi {
     private static Gson gson = new Gson();
 
+    @Value("${test:ok}")
+    private String t;
+
     // 生成新的Hello对象
     private static final Function<Integer,Hello> HELLO_BUILD = Hello::new;
 
@@ -47,6 +51,11 @@ public class HelloApi {
     @HttpTrace("this is a error http trace")
     public ResponseEntity error() throws Exception {
         throw new Exception("ok");
+    }
+
+    @GetMapping("/test")
+    public String ccc(){
+        return t;
     }
 
 
