@@ -1,4 +1,4 @@
-package com.xinchen.tool.httptrace;
+package com.xinchen.tool.httptrace.boot;
 
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
