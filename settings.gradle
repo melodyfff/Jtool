@@ -25,4 +25,5 @@ include 'spi'
 include 'jmh'
 include 'serialization'
 include 'camel'
+include 'rpc-simple'
 
