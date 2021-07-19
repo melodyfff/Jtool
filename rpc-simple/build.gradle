@@ -14,6 +14,7 @@ repositories {
 
 dependencies {
     implementation group: 'org.springframework', name: 'spring-context', version: '5.2.16.RELEASE'
+    implementation group: 'org.springframework', name: 'spring-context-support', version: '5.2.16.RELEASE'
 
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
