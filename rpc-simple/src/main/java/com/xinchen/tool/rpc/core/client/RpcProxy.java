@@ -30,13 +30,12 @@ public class RpcProxy {
         this.serviceDiscovery = serviceDiscovery;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T create(final Class<?> interfaceClass) {
+    public <T> T create(final Class<T> interfaceClass) {
         return create(interfaceClass, "");
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T create(final Class<?> interfaceClass, final String serviceVersion) {
+    public <T> T create(final Class<T> interfaceClass, final String serviceVersion) {
         // 创建动态代理对象
         return (T) Proxy.newProxyInstance(
                 interfaceClass.getClassLoader(),

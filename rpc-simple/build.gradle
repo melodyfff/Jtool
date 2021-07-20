@@ -37,3 +37,8 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
     testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.11.2'
 }
+
+configurations {
+    runtime.exclude group: "org.slf4j", module: "slf4j-log4j12"
+    compile.exclude group: "org.slf4j", module: "slf4j-log4j12"
+}

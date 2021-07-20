@@ -11,7 +11,7 @@ class RpcServerBootstrap {
   private static final Logger LOGGER = LoggerFactory.getLogger(RpcServerBootstrap.class);
 
   public static void main(String[] args) {
-    LOGGER.debug("start server");
+    LOGGER.info("start server");
     new AnnotationConfigApplicationContext(RpcServerConfiguration.class);
   }
 }

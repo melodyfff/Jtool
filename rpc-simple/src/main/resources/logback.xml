@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="AppName" value="rpc"/>
+    <property name="CONSOLE_LOG_PATTERN" value="%boldCyan(%d{yyyy-MM-dd HH:mm:ss.SSS})|-%highlight(%-5level)| %boldYellow(%thread)| %boldMagenta(%logger{5}) - %msg%n"/>
+
+    <contextName>${AppName}</contextName>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.springframework" level="INFO" />
+
+    <logger name="org.apache.zookeeper" level="ERROR" />
+
+    <logger name="org.I0Itec.zkclient" level="ERROR" />
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
