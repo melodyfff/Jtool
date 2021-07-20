@@ -19,6 +19,8 @@
 
     <logger name="org.I0Itec.zkclient" level="ERROR" />
 
+    <logger name="com.xinchen.tool.rpc" level="DEBUG" />
+
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
